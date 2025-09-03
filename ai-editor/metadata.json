@@ -1,0 +1,5 @@
+{
+  "name": "AI 이미지 편집기",
+  "description": "Gemini API를 사용하여 자연어 프롬프트를 기반으로 이미지를 수정하는 AI 기반 이미지 편집기입니다.",
+  "requestFramePermissions": []
+}

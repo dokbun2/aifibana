@@ -1,10 +1,10 @@
 import React from 'react';
-import { IconSparkles, IconCamera, IconArrowRight, IconHanger } from '@tabler/icons-react';
+import { IconSparkles, IconCamera, IconArrowRight, IconHanger, IconEdit } from '@tabler/icons-react';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 
 interface HomeProps {
-    onNavigate: (page: 'shot' | 'angle' | 'tryon') => void;
+    onNavigate: (page: 'shot' | 'angle' | 'tryon' | 'texteditor') => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
@@ -22,7 +22,60 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
 
             {/* Feature Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-8xl mx-auto">
+                {/* Text Editor Card */}
+                <Card 
+                    variant="glass" 
+                    className="group hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden"
+                    onClick={() => onNavigate('texteditor')}
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-3 bg-emerald-500/20 rounded-xl">
+                                <IconEdit size={32} className="text-emerald-500" />
+                            </div>
+                            <span className="text-xs bg-gradient-to-r from-emerald-500 to-green-500 text-white px-3 py-1 rounded-full font-medium animate-pulse">
+                                NEW
+                            </span>
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-emerald-400 to-green-600 bg-clip-text text-transparent">
+                            글로 쓰는 편집기
+                        </h3>
+                    </CardHeader>
+                    <CardBody className="relative">
+                        <p className="text-gray-400 mb-6">
+                            이제는 나노바나나에서 텍스트로 이미지를 편집하세요. 
+                            자연어 명령 만으로 이미지를 수정, 변환, 보정할 수 있습니다.
+                        </p>
+                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                            <li className="flex items-center gap-2">
+                                <span className="text-emerald-500">✓</span> 자연어 명령 처리
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-emerald-500">✓</span> 실시간 편집 미리보기
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-emerald-500">✓</span> 다양한 편집 효과
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-emerald-500">✓</span> 한국어 지원
+                            </li>
+                        </ul>
+                        <Button 
+                            variant="primary" 
+                            fullWidth 
+                            rightIcon={<IconArrowRight size={18} />}
+                            className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white animate-pulse"
+                        >
+                            <span className="font-bold flex items-center gap-2">
+                                <IconSparkles size={16} />
+                                시작하기
+                            </span>
+                        </Button>
+                    </CardBody>
+                </Card>
+
                 {/* Shot Generator Card */}
                 <Card 
                     variant="glass" 
@@ -46,7 +99,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                     <CardBody className="relative">
                         <p className="text-gray-400 mb-6">
                             업로드한 이미지를 기반으로 일관성 있는 새로운 이미지를 생성합니다. 
-                            캐릭터의 스타일과 특징을 유지하면서 다양한 장면과 각도의 이미지를 만드세요.
+                            캐릭터의 스타일, 특징유지, 다양한 장면과 각도의 이미지를 만드세요.
                         </p>
                         <ul className="space-y-2 mb-6 text-sm text-gray-500">
                             <li className="flex items-center gap-2">

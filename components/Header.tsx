@@ -3,8 +3,8 @@ import { IconSettings } from '@tabler/icons-react';
 import { Button } from './ui/Button';
 
 interface HeaderProps {
-    currentPage: 'home' | 'shot' | 'angle' | 'tryon' | 'api';
-    onNavigate: (page: 'home' | 'shot' | 'angle' | 'tryon' | 'api') => void;
+    currentPage: 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'api';
+    onNavigate: (page: 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'api') => void;
     onApiSettingsClick: () => void;
 }
 
@@ -25,7 +25,15 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                     </div>
 
                     {/* Navigation */}
-                    <nav className="hidden md:flex items-center gap-4">
+                    <nav className="hidden md:flex items-center gap-2">
+                        <Button
+                            variant={currentPage === 'texteditor' ? 'primary' : 'ghost'}
+                            size="sm"
+                            onClick={() => onNavigate('texteditor')}
+                            className={currentPage === 'texteditor' ? 'bg-gradient-to-r from-emerald-500 to-green-600' : ''}
+                        >
+                            글 편집기
+                        </Button>
                         <Button
                             variant={currentPage === 'shot' ? 'secondary' : 'ghost'}
                             size="sm"
@@ -71,11 +79,17 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                 </div>
 
                 {/* Mobile Navigation */}
-                <div className="md:hidden mt-4 flex gap-2">
+                <div className="md:hidden mt-4 grid grid-cols-2 gap-2">
+                    <Button
+                        variant={currentPage === 'texteditor' ? 'primary' : 'ghost'}
+                        size="sm"
+                        onClick={() => onNavigate('texteditor')}
+                    >
+                        글 편집기
+                    </Button>
                     <Button
                         variant={currentPage === 'shot' ? 'secondary' : 'ghost'}
                         size="sm"
-                        fullWidth
                         onClick={() => onNavigate('shot')}
                     >
                         이미지 생성

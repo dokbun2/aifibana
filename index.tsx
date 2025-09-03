@@ -11,9 +11,10 @@ import { Home } from './pages/Home';
 import { ShotGenerator } from './pages/ShotGenerator';
 import { AngleConverter } from './pages/AngleConverter';
 import { TryOn } from './pages/TryOn';
+import { TextEditor } from './pages/TextEditor';
 import { IconLoader2 } from '@tabler/icons-react';
 
-type PageType = 'home' | 'shot' | 'angle' | 'tryon' | 'api';
+type PageType = 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'api';
 
 const Loader = ({ message }: { message: string }) => (
     <div className="text-center">
@@ -113,7 +114,7 @@ const App: React.FC = () => {
             
             <main className="container mx-auto">
                 {currentPage === 'home' && (
-                    <Home onNavigate={(page: 'shot' | 'angle' | 'tryon') => setCurrentPage(page)} />
+                    <Home onNavigate={(page: 'shot' | 'angle' | 'tryon' | 'texteditor') => setCurrentPage(page)} />
                 )}
                 {currentPage === 'shot' && ai && (
                     <ShotGenerator ai={ai} />
@@ -123,6 +124,9 @@ const App: React.FC = () => {
                 )}
                 {currentPage === 'tryon' && ai && (
                     <TryOn ai={ai} />
+                )}
+                {currentPage === 'texteditor' && ai && (
+                    <TextEditor ai={ai} />
                 )}
             </main>
         </div>
