@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { GoogleGenAI, Modality } from '@google/genai';
 import { IconUpload, IconTransform, IconDownload, IconLoader2, IconCamera } from '@tabler/icons-react';
 import { Button } from '../components/ui/Button';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
@@ -11,7 +12,11 @@ const Loader = ({ message }: { message: string }) => (
     </div>
 );
 
-export const AngleConverter: React.FC = () => {
+interface AngleConverterProps {
+    ai: GoogleGenAI;
+}
+
+export const AngleConverter: React.FC<AngleConverterProps> = ({ ai }) => {
     const [sourceImage, setSourceImage] = useState<string | null>(null);
     const [convertedImage, setConvertedImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +30,54 @@ export const AngleConverter: React.FC = () => {
         { id: 'top', name: '상단', description: '위에서 내려다본 각도' },
         { id: 'bottom', name: '하단', description: '아래에서 올려다본 각도' }
     ];
+
+    const fileToBase64 = (file: File): Promise<{ data: string; type: string }> => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            if (typeof reader.result === 'string') {
+                resolve({data: reader.result.split(',')[1], type: file.type});
+            } else {
+                reject(new Error("File could not be read as a base64 string."));
+            }
+        };
+        reader.onerror = error => reject(error);
+    });
+
+    const callImageApi = useCallback(async (prompt: string, images: {data: string, type: string}[]) => {
+        if (!ai) return null;
+        try {
+            const imageParts = images.map(img => ({
+                inlineData: { data: img.data, mimeType: img.type || 'image/jpeg' }
+            }));
+            const contents = { parts: [...imageParts, { text: prompt }] };
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash-image-preview',
+                contents: contents,
+                config: { 
+                    responseModalities: [Modality.IMAGE, Modality.TEXT],
+                    generationConfig: {
+                        temperature: 0.4,
+                        topK: 32,
+                        topP: 1,
+                        maxOutputTokens: 4096,
+                    }
+                },
+            });
+            
+            for (const part of response.candidates[0].content.parts) {
+                if (part.inlineData) {
+                    return part.inlineData.data;
+                }
+            }
+            throw new Error("API 응답에서 이미지를 찾을 수 없습니다.");
+        } catch (error) {
+            console.error("Image API Error:", error);
+            alert("이미지 처리 중 오류가 발생했습니다. API 할당량을 확인하거나 잠시 후 다시 시도해주세요.");
+            return null;
+        }
+    }, [ai]);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -55,11 +108,30 @@ export const AngleConverter: React.FC = () => {
         if (!sourceImage) return;
         
         setIsLoading(true);
-        // 실제 API 연결 시 구현
-        setTimeout(() => {
-            setConvertedImage(sourceImage); // 임시로 동일한 이미지 설정
-            setIsLoading(false);
-        }, 2000);
+        
+        // 선택된 앵글에 따른 프롬프트 생성
+        const anglePrompts: {[key: string]: string} = {
+            'front': 'Convert this image to show the subject from a direct front view, facing camera straight on',
+            'side': 'Convert this image to show the subject from a 90-degree side profile view',
+            'three-quarter': 'Convert this image to show the subject from a 45-degree three-quarter angle view',
+            'back': 'Convert this image to show the subject from behind, back view',
+            'top': 'Convert this image to show the subject from a top-down bird\'s eye view',
+            'bottom': 'Convert this image to show the subject from a low angle looking up'
+        };
+
+        const prompt = `${anglePrompts[selectedAngle]}. Maintain the same character, clothing, style, and environment. Only change the viewing angle.`;
+        
+        // base64 데이터 추출
+        const base64Data = sourceImage.split(',')[1];
+        const mimeType = sourceImage.match(/data:([^;]+);/)?.[1] || 'image/jpeg';
+        
+        const resultBase64 = await callImageApi(prompt, [{data: base64Data, type: mimeType}]);
+        
+        if (resultBase64) {
+            setConvertedImage(`data:image/png;base64,${resultBase64}`);
+        }
+        
+        setIsLoading(false);
     };
 
     const downloadImage = (imageData: string, filename: string) => {

@@ -1,0 +1,145 @@
+import React from 'react';
+import { IconSparkles, IconCamera, IconArrowRight } from '@tabler/icons-react';
+import { Card, CardHeader, CardBody } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+
+interface HomeProps {
+    onNavigate: (page: 'shot' | 'angle') => void;
+}
+
+export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
+    return (
+        <div className="container mx-auto p-4 md:p-8">
+            {/* Hero Section */}
+            <div className="text-center mb-12">
+                <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-pulse">
+                    <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">AIFI</span>
+                    <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent ml-2">바나나</span>
+                </h1>
+                <p className="text-xl text-gray-400 mb-8">
+                    AI로 일관성 있는 이미지를 만들고 수정하세요
+                </p>
+            </div>
+
+            {/* Feature Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                {/* Shot Generator Card */}
+                <Card 
+                    variant="glass" 
+                    className="group hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden"
+                    onClick={() => onNavigate('shot')}
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-3 bg-orange-500/20 rounded-xl">
+                                <IconSparkles size={32} className="text-orange-500" />
+                            </div>
+                            <span className="text-xs bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full">
+                                인기
+                            </span>
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+                            샷 이미지 만들기
+                        </h3>
+                    </CardHeader>
+                    <CardBody className="relative">
+                        <p className="text-gray-400 mb-6">
+                            업로드한 이미지를 기반으로 일관성 있는 새로운 이미지를 생성합니다. 
+                            캐릭터의 스타일과 특징을 유지하면서 다양한 장면과 각도의 이미지를 만들어보세요.
+                        </p>
+                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                            <li className="flex items-center gap-2">
+                                <span className="text-orange-500">✓</span> 최대 8개 이미지 업로드
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-orange-500">✓</span> 블록화 프롬프트 지원
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-orange-500">✓</span> 한국어 자동 번역
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-orange-500">✓</span> 다양한 크기로 다운로드
+                            </li>
+                        </ul>
+                        <Button 
+                            variant="secondary" 
+                            fullWidth 
+                            rightIcon={<IconArrowRight size={18} />}
+                            className="group-hover:shadow-orange-500/25"
+                        >
+                            시작하기
+                        </Button>
+                    </CardBody>
+                </Card>
+
+                {/* Angle Converter Card */}
+                <Card 
+                    variant="glass" 
+                    className="group hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden"
+                    onClick={() => onNavigate('angle')}
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-3 bg-purple-500/20 rounded-xl">
+                                <IconCamera size={32} className="text-purple-500" />
+                            </div>
+                            <span className="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">
+                                새기능
+                            </span>
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+                            이미지 앵글 변환
+                        </h3>
+                    </CardHeader>
+                    <CardBody className="relative">
+                        <p className="text-gray-400 mb-6">
+                            하나의 이미지를 다양한 각도로 변환합니다. 
+                            정면, 측면, 3/4 각도 등 원하는 앵글로 이미지를 자연스럽게 변환해보세요.
+                        </p>
+                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                            <li className="flex items-center gap-2">
+                                <span className="text-purple-500">✓</span> 6가지 앵글 지원
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-purple-500">✓</span> 실시간 변환
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-purple-500">✓</span> 높은 품질 유지
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-purple-500">✓</span> 간편한 다운로드
+                            </li>
+                        </ul>
+                        <Button 
+                            variant="primary" 
+                            fullWidth 
+                            rightIcon={<IconArrowRight size={18} />}
+                            className="group-hover:shadow-purple-500/25"
+                        >
+                            시작하기
+                        </Button>
+                    </CardBody>
+                </Card>
+            </div>
+
+            {/* Bottom CTA */}
+            <div className="mt-16 text-center">
+                <p className="text-gray-500 mb-4">
+                    Google Gemini API를 활용한 최신 AI 이미지 생성 기술
+                </p>
+                <div className="flex justify-center gap-4">
+                    <div className="px-4 py-2 bg-gray-800/50 rounded-lg">
+                        <span className="text-gray-400 text-sm">버전</span>
+                        <span className="text-white ml-2 font-medium">2.5</span>
+                    </div>
+                    <div className="px-4 py-2 bg-gray-800/50 rounded-lg">
+                        <span className="text-gray-400 text-sm">모델</span>
+                        <span className="text-white ml-2 font-medium">Gemini Flash</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
