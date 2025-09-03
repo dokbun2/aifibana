@@ -23,6 +23,10 @@ import {
     IconPhotoEdit,
     IconLoader2
 } from '@tabler/icons-react';
+import { Button } from './components/ui/Button';
+import { Card, CardHeader, CardBody, CardFooter } from './components/ui/Card';
+import { Input, Textarea } from './components/ui/Input';
+import { Upload, Image, Wand2, Sparkles } from 'lucide-react';
 
 const MAX_SHOT_FILES = 8;
 
@@ -345,13 +349,14 @@ const App: React.FC = () => {
             )}
 
             <div className="container mx-auto p-4 md:p-8">
-                <header className="text-center mb-8 relative">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-2">
-                        <span className="text-orange-500">AIFI</span>
-                        <span className="text-accent ml-2">바나나</span>
+                <header className="text-center mb-8 relative py-6">
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-purple-500/10 blur-3xl" />
+                    <h1 className="text-5xl md:text-6xl font-bold mb-4 relative animate-pulse">
+                        <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">AIFI</span>
+                        <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent ml-2">바나나</span>
                     </h1>
-                    <p className="text-gray-400 mt-2">AI로 일관성 있는 이미지를 만들고 수정하세요.</p>
-                    <button 
+                    <p className="text-gray-400 mt-2 text-lg">AI로 일관성 있는 이미지를 만들고 수정하세요.</p>
+                    <Button
                         onClick={() => {
                             if (confirm('API 키를 변경하시겠습니까?')) {
                                 localStorage.removeItem('gemini_api_key');
@@ -359,27 +364,35 @@ const App: React.FC = () => {
                                 setAi(null);
                             }
                         }}
-                        className="absolute top-0 right-0 bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-2 rounded-lg text-sm transition flex items-center gap-2"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-0 right-0"
                         title="API 키 변경"
+                        leftIcon={<IconSettings size={16} />}
                     >
-                        <IconSettings size={16} />
-                        <span>API 설정</span>
-                    </button>
+                        API 설정
+                    </Button>
                 </header>
                 
-                <div className="flex justify-center border-b border-gray-700 mb-8">
-                    <div className={`tab ${activeTab === 'shot' ? 'active' : ''}`} onClick={() => setActiveTab('shot')}>
-                        <div className="flex items-center gap-2">
-                            <IconPhotoPlus size={20} />
-                            <span>샷 이미지 만들기</span>
-                        </div>
-                    </div>
-                    <div className={`tab ${activeTab === 'edit' ? 'active' : ''}`} onClick={() => setActiveTab('edit')}>
-                        <div className="flex items-center gap-2">
-                            <IconPhotoEdit size={20} />
-                            <span>이미지 수정</span>
-                        </div>
-                    </div>
+                <div className="flex justify-center gap-2 mb-8 p-2 bg-gray-900/50 backdrop-blur-xl rounded-xl">
+                    <Button
+                        onClick={() => setActiveTab('shot')}
+                        variant={activeTab === 'shot' ? 'primary' : 'ghost'}
+                        size="md"
+                        leftIcon={<IconPhotoPlus size={22} />}
+                        className="relative"
+                    >
+                        샷 이미지 만들기
+                        {activeTab !== 'shot' && <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs px-1 rounded">NEW</span>}
+                    </Button>
+                    <Button
+                        onClick={() => setActiveTab('edit')}
+                        variant={activeTab === 'edit' ? 'primary' : 'ghost'}
+                        size="md"
+                        leftIcon={<IconPhotoEdit size={22} />}
+                    >
+                        이미지 수정
+                    </Button>
                 </div>
 
                 <main>
@@ -391,75 +404,147 @@ const App: React.FC = () => {
                             </h2>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 <div className="space-y-6">
-                                    <div>
-                                        <label className="font-semibold mb-2 block">1. 이미지 업로드 (최대 {MAX_SHOT_FILES}개)</label>
+                                    <Card variant="elevated" className="p-6">
+                                        <label className="font-semibold mb-4 block text-gray-200">1. 이미지 업로드 (최대 {MAX_SHOT_FILES}개)</label>
                                         <div 
                                             id="shot-dropzone" 
-                                            className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition"
-                                            onClick={() => (document.getElementById('shot-file-input') as HTMLInputElement)?.click()}
+                                            className={`border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer hover:border-orange-500 transition-all duration-300 ${shotFiles.length === 0 ? 'p-8' : 'p-4'}`}
+                                            onClick={() => shotFiles.length < MAX_SHOT_FILES && (document.getElementById('shot-file-input') as HTMLInputElement)?.click()}
                                             onDragOver={e => e.preventDefault()}
                                             onDrop={handleDrop}
                                         >
-                                            <IconUpload size={48} className="mx-auto mb-2 text-gray-500" />
-                                            <p className="text-gray-400">이미지를 여기에 드래그하거나 클릭하여 업로드</p>
-                                            <input type="file" id="shot-file-input" className="hidden" multiple accept="image/*" onChange={e => handleFileChange(e.target.files)} />
-                                        </div>
-                                        <div id="shot-thumbnails" className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                            {shotFiles.map((file, index) => (
-                                                <div key={index} className="relative group">
-                                                    <img src={`data:${file.type};base64,${file.data}`} alt={file.name} className={`w-full h-24 object-cover rounded-md ${index === 0 ? 'border-2 border-accent' : ''}`} />
-                                                    <div className="absolute top-0 right-0 m-1 p-1 bg-red-500 rounded-full text-white cursor-pointer opacity-0 group-hover:opacity-100 transition" onClick={() => removeShotFile(index)}>
-                                                        <IconX size={14} />
+                                            {shotFiles.length === 0 ? (
+                                                <>
+                                                    <IconUpload size={48} className="mx-auto mb-2 text-gray-500" />
+                                                    <p className="text-gray-400">이미지를 여기에 드래그하거나 클릭하여 업로드</p>
+                                                </>
+                                            ) : (
+                                                <div className="space-y-4">
+                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                                        {shotFiles.map((file, index) => (
+                                                            <div key={index} className="relative group">
+                                                                <img 
+                                                                    src={`data:${file.type};base64,${file.data}`} 
+                                                                    alt={file.name} 
+                                                                    className={`w-full h-24 object-cover rounded-lg shadow-lg ${index === 0 ? 'ring-2 ring-orange-500 ring-offset-2 ring-offset-gray-900' : ''}`} 
+                                                                />
+                                                                <button
+                                                                    className="absolute top-1 right-1 p-1.5 bg-red-500/90 backdrop-blur rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-red-600"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        removeShotFile(index);
+                                                                    }}
+                                                                >
+                                                                    <IconX size={12} />
+                                                                </button>
+                                                                {index === 0 && (
+                                                                    <div className="absolute bottom-0 left-0 right-0 text-xs bg-gradient-to-r from-orange-500 to-orange-600 text-white px-2 py-1 rounded-b-lg font-medium">
+                                                                        기준 이미지
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                        {shotFiles.length < MAX_SHOT_FILES && (
+                                                            <div className="border-2 border-dashed border-gray-700 rounded-lg flex items-center justify-center h-24 hover:border-orange-500/50 transition-colors cursor-pointer">
+                                                                <IconUpload size={24} className="text-gray-600" />
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    {index === 0 && <div className="absolute bottom-0 text-xs bg-accent text-white px-1 rounded-t-sm">기준</div>}
+                                                    {shotFiles.length < MAX_SHOT_FILES && (
+                                                        <p className="text-xs text-gray-500">클릭하여 이미지 추가 ({shotFiles.length}/{MAX_SHOT_FILES})</p>
+                                                    )}
                                                 </div>
-                                            ))}
+                                            )}
+                                            <input 
+                                                type="file" 
+                                                id="shot-file-input" 
+                                                className="hidden" 
+                                                multiple 
+                                                accept="image/*" 
+                                                onChange={e => handleFileChange(e.target.files)} 
+                                            />
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="shot-prompt" className="font-semibold mb-2 block">2. 블록화 프롬프트 입력</label>
-                                        <textarea id="shot-prompt" rows={8} className="form-textarea text-sm" placeholder="각 요소를 세미콜론(;)으로 구분하여 입력하세요.&#10;예:&#10;STYLE: 애니메이션스타일;&#10;MEDIUM: 사실적인 디지털 사진;&#10;CAMERA: 전신샷;&#10;SCENE: 젊은 남녀 둘이 손을 잡고 한강을 산책하고 있다" value={shotPrompt} onChange={e => setShotPrompt(e.target.value)}></textarea>
-                                    </div>
-                                    <button onClick={onShotGenerate} disabled={shotFiles.length === 0 || isShotLoading} className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                                        {isShotLoading ? (
-                                            <><IconLoader2 className="animate-spin" size={20} /> 생성 중...</>
-                                        ) : (
-                                            <><IconRocket size={20} /> 이미지 생성하기</>
-                                        )}
-                                    </button>
+                                    </Card>
+                                    <Textarea
+                                        label="2. 블록화 프롬프트 입력"
+                                        id="shot-prompt"
+                                        rows={8}
+                                        variant="filled"
+                                        placeholder="각 요소를 세미콜론(;)으로 구분하여 입력하세요.&#10;예:&#10;STYLE: 애니메이션스타일;&#10;MEDIUM: 사실적인 디지털 사진;&#10;CAMERA: 전신샷;&#10;SCENE: 젊은 남녀 둘이 손을 잡고 한강을 산책하고 있다"
+                                        value={shotPrompt}
+                                        onChange={e => setShotPrompt(e.target.value)}
+                                        hint="세미콜론(;)으로 각 요소를 구분하세요"
+                                    />
+                                    <Button 
+                                        onClick={onShotGenerate} 
+                                        disabled={shotFiles.length === 0} 
+                                        isLoading={isShotLoading}
+                                        size="lg"
+                                        fullWidth
+                                        variant="secondary"
+                                        leftIcon={!isShotLoading && <IconRocket size={20} />}
+                                        className="bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-900 border-white/20 shadow-xl"
+                                    >
+                                        {isShotLoading ? '생성 중...' : '이미지 생성하기'}
+                                    </Button>
                                 </div>
-                                <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center h-[500px] p-4 border border-gray-800 relative overflow-hidden">
-                                    {!shotResult && !isShotLoading && <div className="text-center text-gray-500"><p>생성된 이미지가 여기에 표시됩니다.</p></div>}
+                                <Card variant="glass" padding="none" className="h-[500px] flex flex-col items-center justify-center relative overflow-hidden">
+                                    {!shotResult && !isShotLoading && (
+                                        <div className="text-center text-gray-500 p-8">
+                                            <Image size={48} className="mx-auto mb-4 opacity-50" />
+                                            <p>생성된 이미지가 여기에 표시됩니다.</p>
+                                        </div>
+                                    )}
                                     {isShotLoading && <Loader message={shotLoadingMessage} />}
                                     {shotResult && !isShotLoading && (
                                         <>
                                             <img src={`data:image/png;base64,${shotResult}`} alt="Generated shot" className="w-full h-full rounded-md object-contain" />
                                             <div className="absolute bottom-4 flex space-x-2">
-                                                <button onClick={switchToEditTab} className="bg-accent text-white font-bold py-2 px-3 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                    <IconEdit size={18} /> 수정
-                                                </button>
-                                                <button onClick={onShotUpscale} className="bg-blue-500 text-white font-bold py-2 px-3 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                    <IconMaximize size={18} /> 업스케일
-                                                </button>
-                                                <button onClick={() => setZoomedImage(shotResult)} className="bg-gray-600 text-white font-bold py-2 px-3 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                    <IconZoomIn size={18} /> 확대
-                                                </button>
+                                                <Button 
+                                                    onClick={switchToEditTab} 
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    leftIcon={<IconEdit size={18} />}
+                                                >
+                                                    수정
+                                                </Button>
+                                                <Button 
+                                                    onClick={onShotUpscale} 
+                                                    variant="primary"
+                                                    size="sm"
+                                                    leftIcon={<IconMaximize size={18} />}
+                                                >
+                                                    업스케일
+                                                </Button>
+                                                <Button 
+                                                    onClick={() => setZoomedImage(shotResult)} 
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    leftIcon={<IconZoomIn size={18} />}
+                                                >
+                                                    확대
+                                                </Button>
                                                 <div className="relative group">
-                                                    <button className="bg-green-500 text-white font-bold py-2 px-3 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                        <IconDownload size={18} /> 저장 <IconChevronDown size={16} />
-                                                    </button>
-                                                    <div className="absolute bottom-full left-0 mb-1 invisible group-hover:visible opacity-0 group-hover:opacity-100 bg-gray-800 rounded-lg shadow-lg p-2 whitespace-nowrap transition-all duration-200">
-                                                        <button onClick={() => downloadImage(shotResult)} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">원본 크기</button>
-                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1920x1080.png', {width: 1920, height: 1080})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">1920×1080 (FHD)</button>
-                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1280x720.png', {width: 1280, height: 720})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">1280×720 (HD)</button>
-                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1024x1024.png', {width: 1024, height: 1024})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">1024×1024 (Square)</button>
-                                                        <button onClick={() => downloadImage(shotResult, 'aifi-512x512.png', {width: 512, height: 512})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">512×512 (Icon)</button>
+                                                    <Button 
+                                                        variant="success"
+                                                        size="sm"
+                                                        leftIcon={<IconDownload size={18} />}
+                                                        rightIcon={<IconChevronDown size={16} />}
+                                                    >
+                                                        저장
+                                                    </Button>
+                                                    <div className="absolute bottom-full left-0 mb-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 bg-gray-800/95 backdrop-blur-xl rounded-lg shadow-2xl p-2 whitespace-nowrap transition-all duration-200 border border-gray-700">
+                                                        <button onClick={() => downloadImage(shotResult)} className="block w-full text-left px-4 py-2 hover:bg-gray-700/50 rounded text-sm transition-colors">원본 크기</button>
+                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1920x1080.png', {width: 1920, height: 1080})} className="block w-full text-left px-4 py-2 hover:bg-gray-700/50 rounded text-sm transition-colors">1920×1080 (FHD)</button>
+                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1280x720.png', {width: 1280, height: 720})} className="block w-full text-left px-4 py-2 hover:bg-gray-700/50 rounded text-sm transition-colors">1280×720 (HD)</button>
+                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1024x1024.png', {width: 1024, height: 1024})} className="block w-full text-left px-4 py-2 hover:bg-gray-700/50 rounded text-sm transition-colors">1024×1024 (Square)</button>
+                                                        <button onClick={() => downloadImage(shotResult, 'aifi-512x512.png', {width: 512, height: 512})} className="block w-full text-left px-4 py-2 hover:bg-gray-700/50 rounded text-sm transition-colors">512×512 (Icon)</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </>
                                     )}
-                                </div>
+                                </Card>
                             </div>
                         </div>
                     )}
@@ -475,66 +560,97 @@ const App: React.FC = () => {
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[400px]">
-                                            <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center p-2 border border-gray-800 relative overflow-hidden">
-                                                <h3 className="font-semibold mb-2 absolute top-2 z-10 bg-gray-900 px-2 rounded">수정할 이미지</h3>
+                                            <Card variant="elevated" padding="none" className="flex flex-col items-center justify-center relative overflow-hidden">
+                                                <h3 className="font-semibold mb-2 absolute top-4 z-10 bg-gray-900/80 backdrop-blur px-3 py-1 rounded-lg text-sm">수정할 이미지</h3>
                                                 <div className="w-full h-full flex items-center justify-center p-8">
                                                     <img src={`data:image/png;base64,${editSourceImage}`} alt="Image to edit" className="w-full h-full rounded-md object-contain" />
                                                 </div>
-                                                <div className="absolute bottom-2 flex space-x-2">
-                                                    <button onClick={() => setZoomedImage(editSourceImage)} className="bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                        <IconZoomIn size={14} /> 확대
-                                                    </button>
-                                                    <button onClick={() => downloadImage(editSourceImage, 'aifi-banana-source.png')} className="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                        <IconDownload size={14} /> 저장
-                                                    </button>
+                                                <div className="absolute bottom-4 flex space-x-2">
+                                                    <Button 
+                                                        onClick={() => setZoomedImage(editSourceImage)}
+                                                        variant="secondary"
+                                                        size="xs"
+                                                        leftIcon={<IconZoomIn size={14} />}
+                                                    >
+                                                        확대
+                                                    </Button>
+                                                    <Button 
+                                                        onClick={() => downloadImage(editSourceImage, 'aifi-banana-source.png')}
+                                                        variant="success"
+                                                        size="xs"
+                                                        leftIcon={<IconDownload size={14} />}
+                                                    >
+                                                        저장
+                                                    </Button>
                                                 </div>
-                                            </div>
-                                            <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center p-2 border border-gray-800 relative overflow-hidden">
-                                                <h3 className="font-semibold mb-2 absolute top-2 z-10 bg-gray-900 px-2 rounded">수정된 이미지</h3>
+                                            </Card>
+                                            <Card variant="elevated" padding="none" className="flex flex-col items-center justify-center relative overflow-hidden">
+                                                <h3 className="font-semibold mb-2 absolute top-4 z-10 bg-gray-900/80 backdrop-blur px-3 py-1 rounded-lg text-sm">수정된 이미지</h3>
                                                 <div className="w-full h-full flex items-center justify-center p-8">
                                                     {!editResult && !isEditLoading && <div className="text-gray-500 text-sm">수정 결과가 여기에 표시됩니다.</div>}
                                                     {isEditLoading && <Loader message={editLoadingMessage} />}
                                                     {editResult && !isEditLoading && <img src={`data:image/png;base64,${editResult}`} alt="Edited result" className="w-full h-full rounded-md object-contain" />}
                                                 </div>
                                                 {editResult && !isEditLoading && (
-                                                    <div className="absolute bottom-2 flex space-x-2">
-                                                        <button onClick={onEditUpscale} className="bg-blue-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                            <IconMaximize size={14} /> 업스케일
-                                                        </button>
-                                                        <button onClick={() => setZoomedImage(editResult)} className="bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                            <IconZoomIn size={14} /> 확대
-                                                        </button>
+                                                    <div className="absolute bottom-4 flex space-x-2">
+                                                        <Button 
+                                                            onClick={onEditUpscale}
+                                                            variant="primary"
+                                                            size="xs"
+                                                            leftIcon={<IconMaximize size={14} />}
+                                                        >
+                                                            업스케일
+                                                        </Button>
+                                                        <Button 
+                                                            onClick={() => setZoomedImage(editResult)}
+                                                            variant="secondary"
+                                                            size="xs"
+                                                            leftIcon={<IconZoomIn size={14} />}
+                                                        >
+                                                            확대
+                                                        </Button>
                                                         <div className="relative group">
-                                                            <button className="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition flex items-center gap-1">
-                                                                <IconDownload size={14} /> 저장
-                                                            </button>
-                                                            <div className="absolute bottom-full left-0 mb-1 invisible group-hover:visible opacity-0 group-hover:opacity-100 bg-gray-800 rounded-lg shadow-lg p-1 whitespace-nowrap z-10 transition-all duration-200">
-                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited.png')} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">원본</button>
-                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited-fhd.png', {width: 1920, height: 1080})} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">FHD</button>
-                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited-hd.png', {width: 1280, height: 720})} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">HD</button>
+                                                            <Button 
+                                                                variant="success"
+                                                                size="xs"
+                                                                leftIcon={<IconDownload size={14} />}
+                                                            >
+                                                                저장
+                                                            </Button>
+                                                            <div className="absolute bottom-full left-0 mb-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 bg-gray-800/95 backdrop-blur-xl rounded-lg shadow-2xl p-1 whitespace-nowrap z-10 transition-all duration-200 border border-gray-700">
+                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited.png')} className="block w-full text-left text-xs px-3 py-1.5 hover:bg-gray-700/50 rounded transition-colors">원본</button>
+                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited-fhd.png', {width: 1920, height: 1080})} className="block w-full text-left text-xs px-3 py-1.5 hover:bg-gray-700/50 rounded transition-colors">FHD</button>
+                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited-hd.png', {width: 1280, height: 720})} className="block w-full text-left text-xs px-3 py-1.5 hover:bg-gray-700/50 rounded transition-colors">HD</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 )}
-                                            </div>
+                                            </Card>
                                         </div>
                                     </div>
                                     <div className="space-y-4">
                                         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
                                             {editBlocks.map((block, index) => (
-                                                <div key={index}>
-                                                    <label className="text-sm font-medium text-gray-300">{block.key}</label>
-                                                    <input type="text" value={block.value} onChange={e => handleBlockChange(index, e.target.value)} className="form-input mt-1" />
-                                                </div>
+                                                <Input
+                                                    key={index}
+                                                    label={block.key}
+                                                    value={block.value}
+                                                    onChange={e => handleBlockChange(index, e.target.value)}
+                                                    variant="filled"
+                                                />
                                             ))}
                                         </div>
-                                        <button onClick={onEditApply} disabled={isEditLoading} className="w-full bg-accent text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                                            {isEditLoading ? (
-                                                <><IconLoader2 className="animate-spin" size={20} /> 적용 중...</>
-                                            ) : (
-                                                <><IconWand size={20} /> 수정 내용 적용하기</>
-                                            )}
-                                        </button>
+                                        <Button
+                                            onClick={onEditApply}
+                                            disabled={isEditLoading}
+                                            isLoading={isEditLoading}
+                                            size="lg"
+                                            fullWidth
+                                            variant="primary"
+                                            leftIcon={!isEditLoading && <IconWand size={20} />}
+                                        >
+                                            {isEditLoading ? '적용 중...' : '수정 내용 적용하기'}
+                                        </Button>
                                     </div>
                                 </div>
                             )}

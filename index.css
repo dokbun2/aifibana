@@ -107,28 +107,53 @@ h1, h2, h3, h4, h5, h6 {
 .tab {
     position: relative;
     cursor: pointer;
-    padding: 0.875rem 1.5rem;
+    padding: 1rem 2rem;
     color: var(--text-muted);
-    font-weight: 500;
-    transition: all 0.2s ease;
-    border-bottom: 2px solid transparent;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.025em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 3px solid transparent;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), transparent);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    margin: 0 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .tab:hover {
-    color: var(--text-secondary);
-    background: linear-gradient(to bottom, transparent, rgba(139, 92, 246, 0.05));
+    color: var(--text-primary);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(16, 185, 129, 0.05));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
 }
 
 .tab.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
-    background: linear-gradient(to bottom, transparent, rgba(139, 92, 246, 0.1));
+    color: transparent;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, var(--primary-color), var(--accent-color)) 1;
+    box-shadow: 0 8px 16px rgba(139, 92, 246, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.tab.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(16, 185, 129, 0.1));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    z-index: -1;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .tab.active::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: -3px;
     left: 50%;
     transform: translateX(-50%);
     width: 30%;
@@ -497,4 +522,123 @@ button:active::before {
 
 @media (min-width: 1024px) {
     .lg\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Tab Container Styles */
+.tab-container {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid rgba(39, 39, 42, 0.5);
+    margin-bottom: 2rem;
+    position: relative;
+    background: linear-gradient(to bottom, transparent, rgba(24, 24, 27, 0.3));
+}
+
+.tab-container::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent,
+        var(--primary-color) 20%,
+        var(--accent-color) 50%,
+        var(--primary-color) 80%,
+        transparent
+    );
+    opacity: 0.5;
+}
+
+/* Icon Animations */
+.tab svg {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab:hover svg {
+    transform: rotate(5deg) scale(1.1);
+    filter: drop-shadow(0 4px 6px rgba(139, 92, 246, 0.3));
+}
+
+.tab.active svg {
+    animation: iconPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(139, 92, 246, 0.4));
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.15;
+    }
+    50% {
+        opacity: 0.25;
+    }
+}
+
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.05) rotate(2deg);
+    }
+    75% {
+        transform: scale(1.05) rotate(-2deg);
+    }
+}
+
+/* Tab Badge */
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, var(--warning-color), #fbbf24);
+    color: var(--bg-primary);
+    border-radius: 9999px;
+    margin-left: 0.5rem;
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+    }
+}
+
+/* Tab Text Gradient */
+.tab span {
+    position: relative;
+    z-index: 1;
+}
+
+.tab.active span {
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--primary-color));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
