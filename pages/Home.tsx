@@ -1,10 +1,10 @@
 import React from 'react';
-import { IconSparkles, IconCamera, IconArrowRight } from '@tabler/icons-react';
+import { IconSparkles, IconCamera, IconArrowRight, IconHanger } from '@tabler/icons-react';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 
 interface HomeProps {
-    onNavigate: (page: 'shot' | 'angle') => void;
+    onNavigate: (page: 'shot' | 'angle' | 'tryon') => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
@@ -22,7 +22,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
 
             {/* Feature Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 {/* Shot Generator Card */}
                 <Card 
                     variant="glass" 
@@ -46,7 +46,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                     <CardBody className="relative">
                         <p className="text-gray-400 mb-6">
                             업로드한 이미지를 기반으로 일관성 있는 새로운 이미지를 생성합니다. 
-                            캐릭터의 스타일과 특징을 유지하면서 다양한 장면과 각도의 이미지를 만들어보세요.
+                            캐릭터의 스타일과 특징을 유지하면서 다양한 장면과 각도의 이미지를 만드세요.
                         </p>
                         <ul className="space-y-2 mb-6 text-sm text-gray-500">
                             <li className="flex items-center gap-2">
@@ -117,6 +117,56 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             fullWidth 
                             rightIcon={<IconArrowRight size={18} />}
                             className="group-hover:shadow-purple-500/25"
+                        >
+                            시작하기
+                        </Button>
+                    </CardBody>
+                </Card>
+
+                {/* Virtual Try-On Card */}
+                <Card 
+                    variant="glass" 
+                    className="group hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden"
+                    onClick={() => onNavigate('tryon')}
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-3 bg-cyan-500/20 rounded-xl">
+                                <IconHanger size={32} className="text-cyan-500" />
+                            </div>
+                            <span className="text-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-1 rounded-full font-medium">
+                                HOT
+                            </span>
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
+                            가상 옷 입히기
+                        </h3>
+                    </CardHeader>
+                    <CardBody className="relative">
+                        <p className="text-gray-400 mb-6">
+                            AI로 가상으로 옷을 입혀보세요. 
+                            사람 이미지와 옷 이미지를 업로드하면 자연스럽게 합성된 결과를 만들어드립니다.
+                        </p>
+                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                            <li className="flex items-center gap-2">
+                                <span className="text-cyan-500">✓</span> 사실적인 옷 합성
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-cyan-500">✓</span> 자연스러운 주름 표현
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-cyan-500">✓</span> 체형에 맞는 피팅
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-cyan-500">✓</span> 빠른 처리 속도
+                            </li>
+                        </ul>
+                        <Button 
+                            variant="primary" 
+                            fullWidth 
+                            rightIcon={<IconArrowRight size={18} />}
+                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 group-hover:shadow-cyan-500/25"
                         >
                             시작하기
                         </Button>

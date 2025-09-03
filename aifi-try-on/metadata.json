@@ -1,0 +1,5 @@
+{
+  "name": "AIFI Try-On",
+  "description": "Upload a photo of a person and a photo of clothing, and the AI will generate an image of the person wearing that outfit.",
+  "requestFramePermissions": []
+}

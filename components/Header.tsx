@@ -3,8 +3,8 @@ import { IconSettings } from '@tabler/icons-react';
 import { Button } from './ui/Button';
 
 interface HeaderProps {
-    currentPage: 'home' | 'shot' | 'angle' | 'api';
-    onNavigate: (page: 'home' | 'shot' | 'angle' | 'api') => void;
+    currentPage: 'home' | 'shot' | 'angle' | 'tryon' | 'api';
+    onNavigate: (page: 'home' | 'shot' | 'angle' | 'tryon' | 'api') => void;
     onApiSettingsClick: () => void;
 }
 
@@ -39,6 +39,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                             onClick={() => onNavigate('angle')}
                         >
                             앵글 변환
+                        </Button>
+                        <Button
+                            variant={currentPage === 'tryon' ? 'primary' : 'ghost'}
+                            size="sm"
+                            onClick={() => onNavigate('tryon')}
+                            className={currentPage === 'tryon' ? 'bg-gradient-to-r from-cyan-500 to-blue-600' : ''}
+                        >
+                            가상 착용
                         </Button>
                         <Button
                             variant="ghost"
@@ -79,6 +87,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                         onClick={() => onNavigate('angle')}
                     >
                         앵글 변환
+                    </Button>
+                    <Button
+                        variant={currentPage === 'tryon' ? 'primary' : 'ghost'}
+                        size="sm"
+                        fullWidth
+                        onClick={() => onNavigate('tryon')}
+                    >
+                        가상 착용
                     </Button>
                 </div>
             </div>
