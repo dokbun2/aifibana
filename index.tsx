@@ -86,9 +86,28 @@ const App: React.FC = () => {
         reader.onerror = error => reject(error);
     });
 
-    const downloadImage = (base64Data: string, filename = 'aifi-banana-image.png') => {
+    const resizeImage = (base64Data: string, targetWidth: number, targetHeight: number): Promise<string> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, targetWidth, targetHeight);
+                resolve(canvas.toDataURL('image/png').split(',')[1]);
+            };
+            img.src = `data:image/png;base64,${base64Data}`;
+        });
+    };
+
+    const downloadImage = async (base64Data: string, filename = 'aifi-banana-image.png', resize?: {width: number, height: number}) => {
+        let finalData = base64Data;
+        if (resize) {
+            finalData = await resizeImage(base64Data, resize.width, resize.height);
+        }
         const link = document.createElement('a');
-        link.href = `data:image/png;base64,${base64Data}`;
+        link.href = `data:image/png;base64,${finalData}`;
         link.download = filename;
         document.body.appendChild(link);
         link.click();
@@ -149,7 +168,16 @@ const App: React.FC = () => {
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash-image-preview',
                 contents: contents,
-                config: { responseModalities: [Modality.IMAGE, Modality.TEXT] },
+                config: { 
+                    responseModalities: [Modality.IMAGE, Modality.TEXT],
+                    // 이미지 생성 품질 설정 (간접적으로 크기에 영향)
+                    generationConfig: {
+                        temperature: 0.4,
+                        topK: 32,
+                        topP: 1,
+                        maxOutputTokens: 4096,
+                    }
+                },
             });
             
             for (const part of response.candidates[0].content.parts) {
@@ -373,7 +401,16 @@ const App: React.FC = () => {
                                                 <button onClick={switchToEditTab} className="bg-accent text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">수정</button>
                                                 <button onClick={onShotUpscale} className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">업스케일</button>
                                                 <button onClick={() => setZoomedImage(shotResult)} className="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">확대</button>
-                                                <button onClick={() => downloadImage(shotResult)} className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">저장</button>
+                                                <div className="relative group">
+                                                    <button className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">저장 ▼</button>
+                                                    <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-gray-800 rounded-lg shadow-lg p-2 whitespace-nowrap">
+                                                        <button onClick={() => downloadImage(shotResult)} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">원본 크기</button>
+                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1920x1080.png', {width: 1920, height: 1080})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">1920×1080 (FHD)</button>
+                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1280x720.png', {width: 1280, height: 720})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">1280×720 (HD)</button>
+                                                        <button onClick={() => downloadImage(shotResult, 'aifi-1024x1024.png', {width: 1024, height: 1024})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">1024×1024 (Square)</button>
+                                                        <button onClick={() => downloadImage(shotResult, 'aifi-512x512.png', {width: 512, height: 512})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">512×512 (Icon)</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </>
                                     )}
@@ -411,7 +448,14 @@ const App: React.FC = () => {
                                                     <div className="absolute bottom-2 flex space-x-2">
                                                         <button onClick={onEditUpscale} className="bg-blue-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">업스케일</button>
                                                         <button onClick={() => setZoomedImage(editResult)} className="bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">확대</button>
-                                                        <button onClick={() => downloadImage(editResult, 'aifi-banana-edited.png')} className="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">저장</button>
+                                                        <div className="relative group">
+                                                            <button className="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">저장</button>
+                                                            <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-gray-800 rounded-lg shadow-lg p-1 whitespace-nowrap z-10">
+                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited.png')} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">원본</button>
+                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited-fhd.png', {width: 1920, height: 1080})} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">FHD</button>
+                                                                <button onClick={() => downloadImage(editResult, 'aifi-edited-hd.png', {width: 1280, height: 720})} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">HD</button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
