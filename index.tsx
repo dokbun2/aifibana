@@ -79,7 +79,13 @@ const App: React.FC = () => {
     };
 
     if (needsApiKey || showApiSettings) {
-        return <ApiSetup onApiKeySet={handleApiKeySet} />;
+        return (
+            <ApiSetup 
+                onApiKeySet={handleApiKeySet} 
+                onClose={showApiSettings ? () => setShowApiSettings(false) : undefined}
+                showCloseButton={showApiSettings}
+            />
+        );
     }
 
     if (apiError) {

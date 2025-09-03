@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { IconX } from '@tabler/icons-react';
 
 interface ApiSetupProps {
     onApiKeySet: (apiKey: string) => void;
+    onClose?: () => void;
+    showCloseButton?: boolean;
 }
 
-const ApiSetup: React.FC<ApiSetupProps> = ({ onApiKeySet }) => {
+const ApiSetup: React.FC<ApiSetupProps> = ({ onApiKeySet, onClose, showCloseButton = false }) => {
     const [apiKey, setApiKey] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -53,7 +56,16 @@ const ApiSetup: React.FC<ApiSetupProps> = ({ onApiKeySet }) => {
                     <p className="text-gray-400">AI로 일관성 있는 이미지를 만들고 수정하세요.</p>
                 </div>
 
-                <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
+                <div className="bg-gray-900 rounded-lg p-6 border border-gray-800 relative">
+                    {showCloseButton && onClose && (
+                        <button
+                            onClick={onClose}
+                            className="absolute top-4 right-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                            aria-label="닫기"
+                        >
+                            <IconX size={20} className="text-gray-400 hover:text-white" />
+                        </button>
+                    )}
                     <h2 className="text-xl font-semibold text-white mb-4">Google Gemini API 설정</h2>
                     
                     <div className="mb-4 text-sm text-gray-400 space-y-2">
