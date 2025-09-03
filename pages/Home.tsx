@@ -100,7 +100,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                     <CardBody className="relative">
                         <p className="text-gray-400 mb-6">
                             업로드한 이미지를 기반으로 일관성 있는 새로운 이미지를 생성합니다. 
-                            캐릭터의 스타일, 특징유지, 다양한 장면과 각도의 이미지를 만드세요.
+                            캐릭터의 스타일,특징,다양한 장면과 각도의 이미지를 만드세요.
                         </p>
                         <ul className="space-y-2 mb-6 text-sm text-gray-500">
                             <li className="flex items-center gap-2">
