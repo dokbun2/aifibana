@@ -63,12 +63,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             </li>
                         </ul>
                         <Button 
-                            variant="secondary" 
+                            variant="primary" 
                             fullWidth 
                             rightIcon={<IconArrowRight size={18} />}
-                            className="group-hover:shadow-orange-500/25"
+                            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
                         >
-                            시작하기
+                            <span className="font-bold">시작하기</span>
                         </Button>
                     </CardBody>
                 </Card>
@@ -116,9 +116,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             variant="primary" 
                             fullWidth 
                             rightIcon={<IconArrowRight size={18} />}
-                            className="group-hover:shadow-purple-500/25"
+                            className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
                         >
-                            시작하기
+                            <span className="font-bold">시작하기</span>
                         </Button>
                     </CardBody>
                 </Card>
@@ -166,9 +166,12 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             variant="primary" 
                             fullWidth 
                             rightIcon={<IconArrowRight size={18} />}
-                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 group-hover:shadow-cyan-500/25"
+                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transform hover:scale-105 transition-all duration-300 animate-pulse border-2 border-white"
                         >
-                            시작하기
+                            <span className="font-bold flex items-center gap-2">
+                                <IconSparkles size={16} />
+                                시작하기
+                            </span>
                         </Button>
                     </CardBody>
                 </Card>
