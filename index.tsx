@@ -403,7 +403,7 @@ const App: React.FC = () => {
                                                 <button onClick={() => setZoomedImage(shotResult)} className="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">확대</button>
                                                 <div className="relative group">
                                                     <button className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">저장 ▼</button>
-                                                    <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-gray-800 rounded-lg shadow-lg p-2 whitespace-nowrap">
+                                                    <div className="absolute bottom-full left-0 mb-1 invisible group-hover:visible opacity-0 group-hover:opacity-100 bg-gray-800 rounded-lg shadow-lg p-2 whitespace-nowrap transition-all duration-200">
                                                         <button onClick={() => downloadImage(shotResult)} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">원본 크기</button>
                                                         <button onClick={() => downloadImage(shotResult, 'aifi-1920x1080.png', {width: 1920, height: 1080})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">1920×1080 (FHD)</button>
                                                         <button onClick={() => downloadImage(shotResult, 'aifi-1280x720.png', {width: 1280, height: 720})} className="block w-full text-left px-3 py-1 hover:bg-gray-700 rounded">1280×720 (HD)</button>
@@ -450,7 +450,7 @@ const App: React.FC = () => {
                                                         <button onClick={() => setZoomedImage(editResult)} className="bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">확대</button>
                                                         <div className="relative group">
                                                             <button className="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">저장</button>
-                                                            <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-gray-800 rounded-lg shadow-lg p-1 whitespace-nowrap z-10">
+                                                            <div className="absolute bottom-full left-0 mb-1 invisible group-hover:visible opacity-0 group-hover:opacity-100 bg-gray-800 rounded-lg shadow-lg p-1 whitespace-nowrap z-10 transition-all duration-200">
                                                                 <button onClick={() => downloadImage(editResult, 'aifi-edited.png')} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">원본</button>
                                                                 <button onClick={() => downloadImage(editResult, 'aifi-edited-fhd.png', {width: 1920, height: 1080})} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">FHD</button>
                                                                 <button onClick={() => downloadImage(editResult, 'aifi-edited-hd.png', {width: 1280, height: 720})} className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-700 rounded">HD</button>
