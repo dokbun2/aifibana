@@ -391,12 +391,12 @@ const App: React.FC = () => {
                                         {isShotLoading ? '생성 중...' : '이미지 생성하기 🚀'}
                                     </button>
                                 </div>
-                                <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center min-h-[400px] p-4 border border-gray-800 relative">
+                                <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center h-[500px] p-4 border border-gray-800 relative overflow-hidden">
                                     {!shotResult && !isShotLoading && <div className="text-center text-gray-500"><p>생성된 이미지가 여기에 표시됩니다.</p></div>}
                                     {isShotLoading && <Loader message={shotLoadingMessage} />}
                                     {shotResult && !isShotLoading && (
                                         <>
-                                            <img src={`data:image/png;base64,${shotResult}`} alt="Generated shot" className="max-w-full max-h-full rounded-md object-contain" />
+                                            <img src={`data:image/png;base64,${shotResult}`} alt="Generated shot" className="w-full h-full rounded-md object-contain" />
                                             <div className="absolute bottom-4 flex space-x-2">
                                                 <button onClick={switchToEditTab} className="bg-accent text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">수정</button>
                                                 <button onClick={onShotUpscale} className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">업스케일</button>
@@ -426,23 +426,23 @@ const App: React.FC = () => {
                             ) : (
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                     <div className="space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[300px]">
-                                            <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center p-2 border border-gray-800 relative">
-                                                <h3 className="font-semibold mb-2">수정할 이미지</h3>
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <img src={`data:image/png;base64,${editSourceImage}`} alt="Image to edit" className="max-w-full max-h-full rounded-md object-contain" />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[400px]">
+                                            <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center p-2 border border-gray-800 relative overflow-hidden">
+                                                <h3 className="font-semibold mb-2 absolute top-2 z-10 bg-gray-900 px-2 rounded">수정할 이미지</h3>
+                                                <div className="w-full h-full flex items-center justify-center p-8">
+                                                    <img src={`data:image/png;base64,${editSourceImage}`} alt="Image to edit" className="w-full h-full rounded-md object-contain" />
                                                 </div>
                                                 <div className="absolute bottom-2 flex space-x-2">
                                                     <button onClick={() => setZoomedImage(editSourceImage)} className="bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">확대</button>
                                                     <button onClick={() => downloadImage(editSourceImage, 'aifi-banana-source.png')} className="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">저장</button>
                                                 </div>
                                             </div>
-                                            <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center p-2 border border-gray-800 relative">
-                                                <h3 className="font-semibold mb-2">수정된 이미지</h3>
-                                                <div className="w-full h-full flex items-center justify-center">
+                                            <div className="bg-gray-900 rounded-lg flex flex-col items-center justify-center p-2 border border-gray-800 relative overflow-hidden">
+                                                <h3 className="font-semibold mb-2 absolute top-2 z-10 bg-gray-900 px-2 rounded">수정된 이미지</h3>
+                                                <div className="w-full h-full flex items-center justify-center p-8">
                                                     {!editResult && !isEditLoading && <div className="text-gray-500 text-sm">수정 결과가 여기에 표시됩니다.</div>}
                                                     {isEditLoading && <Loader message={editLoadingMessage} />}
-                                                    {editResult && !isEditLoading && <img src={`data:image/png;base64,${editResult}`} alt="Edited result" className="max-w-full max-h-full rounded-md object-contain" />}
+                                                    {editResult && !isEditLoading && <img src={`data:image/png;base64,${editResult}`} alt="Edited result" className="w-full h-full rounded-md object-contain" />}
                                                 </div>
                                                 {editResult && !isEditLoading && (
                                                     <div className="absolute bottom-2 flex space-x-2">
