@@ -267,7 +267,7 @@ export const TryOn: React.FC<TryOnProps> = ({ ai }) => {
                         fullWidth
                         variant="primary"
                         leftIcon={!isLoading && <IconSparkles size={20} />}
-                        className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
+                        className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 border-2 border-white/80 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40"
                     >
                         {isLoading ? '옷을 입히는 중...' : '가상으로 입혀보기'}
                     </Button>

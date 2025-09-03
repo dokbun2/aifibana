@@ -301,6 +301,7 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai }) => {
                             fullWidth
                             variant="primary"
                             leftIcon={!isShotLoading && <IconRocket size={20} />}
+                            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 border-2 border-white/80 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40"
                         >
                             {isShotLoading ? '생성 중...' : '이미지 생성하기'}
                         </Button>

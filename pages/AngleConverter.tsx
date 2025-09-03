@@ -223,6 +223,7 @@ export const AngleConverter: React.FC<AngleConverterProps> = ({ ai }) => {
                         fullWidth
                         variant="primary"
                         leftIcon={!isLoading && <IconTransform size={20} />}
+                        className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 border-2 border-white/80 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40"
                     >
                         {isLoading ? '변환 중...' : '앵글 변환하기'}
                     </Button>

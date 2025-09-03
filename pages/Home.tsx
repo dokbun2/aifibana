@@ -233,16 +233,16 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             {/* Bottom CTA */}
             <div className="mt-16 text-center">
                 <p className="text-gray-500 mb-4">
-                    Google Gemini API를 활용한 최신 AI 이미지 생성 기술
+                    Google Gemini API를 활용한 최신 AI 이미지 생성 기술, Made by Haruoff
                 </p>
                 <div className="flex justify-center gap-4">
                     <div className="px-4 py-2 bg-gray-800/50 rounded-lg">
-                        <span className="text-gray-400 text-sm">버전</span>
-                        <span className="text-white ml-2 font-medium">2.5</span>
+                        <span className="text-gray-400 text-sm">주인</span>
+                        <span className="text-white ml-2 font-medium">AIFI</span>
                     </div>
                     <div className="px-4 py-2 bg-gray-800/50 rounded-lg">
-                        <span className="text-gray-400 text-sm">모델</span>
-                        <span className="text-white ml-2 font-medium">Gemini Flash</span>
+                        <span className="text-gray-400 text-sm">개발자</span>
+                        <span className="text-white ml-2 font-medium">Haru Off</span>
                     </div>
                 </div>
             </div>

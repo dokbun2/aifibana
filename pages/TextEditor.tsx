@@ -234,7 +234,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({ ai }) => {
                         fullWidth
                         variant="primary"
                         leftIcon={!isLoading && <IconWand size={20} />}
-                        className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700"
+                        className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 border-2 border-white/80 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40"
                     >
                         {isLoading ? '편집 중...' : '이미지 편집하기'}
                     </Button>
