@@ -44,7 +44,7 @@ const App: React.FC = () => {
 
     // "Shot" Tab State
     const [shotFiles, setShotFiles] = useState<{name: string, data: string, type: string}[]>([]);
-    const [shotPrompt, setShotPrompt] = useState('STYLE: 시네마틱 픽사 애니메이션 스타일;\nSCENE: 소년과 소녀가 카페 테이블에 앉아있다;\nCHARACTER_1: 교복 입은 한국 소년;');
+    const [shotPrompt, setShotPrompt] = useState('STYLE: 애니메이션스타일;\nMEDIUM: 사실적인 디지털 사진;\nCAMERA: 전신샷;\nSCENE: 젊은 남녀 둘이 손을 잡고 한강을 산책하고 있다');
     const [shotResult, setShotResult] = useState<string | null>(null);
     const [isShotLoading, setIsShotLoading] = useState(false);
     const [shotLoadingMessage, setShotLoadingMessage] = useState('');
@@ -347,7 +347,7 @@ const App: React.FC = () => {
             <div className="container mx-auto p-4 md:p-8">
                 <header className="text-center mb-8 relative">
                     <h1 className="text-4xl md:text-5xl font-bold mb-2">
-                        <span className="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">AIFI</span>
+                        <span className="text-orange-500">AIFI</span>
                         <span className="text-accent ml-2">바나나</span>
                     </h1>
                     <p className="text-gray-400 mt-2">AI로 일관성 있는 이미지를 만들고 수정하세요.</p>
@@ -418,7 +418,7 @@ const App: React.FC = () => {
                                     </div>
                                     <div>
                                         <label htmlFor="shot-prompt" className="font-semibold mb-2 block">2. 블록화 프롬프트 입력</label>
-                                        <textarea id="shot-prompt" rows={8} className="form-textarea text-sm" placeholder="각 요소를 세미콜론(;)으로 구분하여 입력하세요.&#10;예:&#10;STYLE: 시네마틱 픽사 애니메이션 스타일;&#10;SCENE: 소년과 소녀가 카페 테이블에 앉아있다;&#10;CHARACTER_1: 교복 입은 한국 소년;" value={shotPrompt} onChange={e => setShotPrompt(e.target.value)}></textarea>
+                                        <textarea id="shot-prompt" rows={8} className="form-textarea text-sm" placeholder="각 요소를 세미콜론(;)으로 구분하여 입력하세요.&#10;예:&#10;STYLE: 애니메이션스타일;&#10;MEDIUM: 사실적인 디지털 사진;&#10;CAMERA: 전신샷;&#10;SCENE: 젊은 남녀 둘이 손을 잡고 한강을 산책하고 있다" value={shotPrompt} onChange={e => setShotPrompt(e.target.value)}></textarea>
                                     </div>
                                     <button onClick={onShotGenerate} disabled={shotFiles.length === 0 || isShotLoading} className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                                         {isShotLoading ? (

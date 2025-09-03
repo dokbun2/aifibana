@@ -52,6 +52,30 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;
 }
 
+/* Gradient Text */
+.bg-gradient-to-r {
+    background: linear-gradient(90deg, var(--primary-color), #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.from-primary {
+    --tw-gradient-from: var(--primary-color);
+}
+
+.to-purple-400 {
+    --tw-gradient-to: #c084fc;
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-transparent {
+    color: transparent;
+}
+
 /* Utility Classes */
 .bg-primary { background-color: var(--primary-color); }
 .text-primary { color: var(--primary-color); }
