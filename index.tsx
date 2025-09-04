@@ -31,6 +31,8 @@ const App: React.FC = () => {
     const [apiKey, setApiKey] = useState<string | null>(null);
     const [needsApiKey, setNeedsApiKey] = useState(false);
     const [showApiSettings, setShowApiSettings] = useState(false);
+    // Data for TextEditor
+    const [editImageData, setEditImageData] = useState<{ imageData: string; prompt: string } | null>(null);
 
     
     useEffect(() => {
@@ -71,6 +73,10 @@ const App: React.FC = () => {
             setShowApiSettings(true);
         } else {
             setCurrentPage(page);
+            // Clear edit image data when navigating away from texteditor
+            if (page !== 'texteditor') {
+                setEditImageData(null);
+            }
         }
     };
 
@@ -123,7 +129,14 @@ const App: React.FC = () => {
                     <Home onNavigate={(page: 'shot' | 'angle' | 'tryon' | 'texteditor') => setCurrentPage(page)} />
                 )}
                 {currentPage === 'shot' && ai && (
-                    <ShotGenerator ai={ai} />
+                    <ShotGenerator 
+                        ai={ai}
+                        onEditImage={(imageData, prompt) => {
+                            setEditImageData({ imageData, prompt });
+                            setCurrentPage('texteditor');
+                        }}
+                        onNavigateToEditor={() => setCurrentPage('texteditor')}
+                    />
                 )}
                 {currentPage === 'angle' && ai && (
                     <AngleConverter ai={ai} />
@@ -132,7 +145,12 @@ const App: React.FC = () => {
                     <TryOn ai={ai} />
                 )}
                 {currentPage === 'texteditor' && ai && (
-                    <TextEditor ai={ai} />
+                    <TextEditor 
+                        ai={ai} 
+                        initialImage={editImageData?.imageData}
+                        initialPrompt={editImageData?.prompt}
+                        onNavigateToShot={() => setCurrentPage('shot')}
+                    />
                 )}
             </main>
         </div>

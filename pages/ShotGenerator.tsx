@@ -20,9 +20,11 @@ const Loader = ({ message }: { message: string }) => (
 
 interface ShotGeneratorProps {
     ai: GoogleGenAI;
+    onEditImage?: (imageData: string, prompt: string) => void;
+    onNavigateToEditor?: () => void;
 }
 
-export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai }) => {
+export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai, onEditImage, onNavigateToEditor }) => {
     const [shotFiles, setShotFiles] = useState<{name: string, data: string, type: string}[]>([]);
     const [shotPrompt, setShotPrompt] = useState('STYLE: 애니메이션스타일;\nMEDIUM: 사실적인 디지털 사진;\nCAMERA: 전신샷;\nSCENE: 젊은 남녀 둘이 손을 잡고 한강을 산책하고 있다');
     const [shotResult, setShotResult] = useState<string | null>(null);
@@ -213,12 +215,22 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai }) => {
             )}
 
             <div className="container mx-auto p-4 md:p-8">
-                <h2 className="text-3xl font-bold mb-8 text-center flex items-center justify-center gap-3">
-                    <IconSparkles size={36} className="text-orange-500" />
-                    <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-                        일관성 있는 샷 이미지 만들기
-                    </span>
-                </h2>
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-3xl font-bold text-center flex items-center gap-3">
+                        <IconSparkles size={36} className="text-orange-500" />
+                        <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+                            일관성 있는 샷 이미지 만들기
+                        </span>
+                    </h2>
+                    <Button
+                        onClick={onNavigateToEditor}
+                        variant="ghost"
+                        leftIcon={<IconEdit size={20} />}
+                        className="text-emerald-400 hover:text-emerald-300"
+                    >
+                        이미지 편집기로 이동
+                    </Button>
+                </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-6">
@@ -226,7 +238,14 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai }) => {
                             <label className="font-semibold mb-4 block text-gray-200">1. 이미지 업로드 (최대 {MAX_SHOT_FILES}개)</label>
                             <div 
                                 className={`border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer hover:border-orange-500 transition-all duration-300 ${shotFiles.length === 0 ? 'p-8' : 'p-4'}`}
-                                onClick={() => shotFiles.length < MAX_SHOT_FILES && (document.getElementById('shot-file-input') as HTMLInputElement)?.click()}
+                                onClick={() => {
+                                    if (shotFiles.length < MAX_SHOT_FILES) {
+                                        const input = document.getElementById('shot-file-input') as HTMLInputElement;
+                                        if (input) {
+                                            input.click();
+                                        }
+                                    }
+                                }}
                                 onDragOver={e => e.preventDefault()}
                                 onDrop={handleDrop}
                             >
@@ -262,7 +281,16 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai }) => {
                                                 </div>
                                             ))}
                                             {shotFiles.length < MAX_SHOT_FILES && (
-                                                <div className="border-2 border-dashed border-gray-700 rounded-lg flex items-center justify-center h-24 hover:border-orange-500/50 transition-colors cursor-pointer">
+                                                <div 
+                                                    className="border-2 border-dashed border-gray-700 rounded-lg flex items-center justify-center h-24 hover:border-orange-500/50 transition-colors cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        const input = document.getElementById('shot-file-input') as HTMLInputElement;
+                                                        if (input) {
+                                                            input.click();
+                                                        }
+                                                    }}
+                                                >
                                                     <IconUpload size={24} className="text-gray-600" />
                                                 </div>
                                             )}
@@ -319,6 +347,14 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai }) => {
                             <>
                                 <img src={`data:image/png;base64,${shotResult}`} alt="Generated shot" className="w-full h-full rounded-md object-contain" />
                                 <div className="absolute bottom-4 flex flex-wrap gap-2 justify-center">
+                                    <Button 
+                                        onClick={() => onEditImage && onEditImage(shotResult, shotPrompt)}
+                                        variant="secondary"
+                                        size="sm"
+                                        leftIcon={<IconEdit size={18} />}
+                                    >
+                                        수정
+                                    </Button>
                                     <Button 
                                         onClick={onShotUpscale} 
                                         variant="primary"

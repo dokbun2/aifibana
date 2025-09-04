@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIFI 바나나</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 커스텀 스타일 및 색상 변수 설정 */
+        :root {
+            --bg-color: #000000;
+            --primary-color: #2A9D8F;
+            --accent-color: #FF7F50;
+            --text-color: #E5E7EB; /* light gray */
+            --border-color: #4B5563; /* darker gray */
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Pretendard', sans-serif;
+        }
+        .bg-primary { background-color: var(--primary-color); }
+        .text-primary { color: var(--primary-color); }
+        .border-primary { border-color: var(--primary-color); }
+        .bg-accent { background-color: var(--accent-color); }
+        .text-accent { color: var(--accent-color); }
+        
+        /* 탭 스타일 */
+        .tab {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+        .tab:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* 커스텀 input 스타일 */
+        .form-input, .form-select, .form-textarea {
+            background-color: #1f2937;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(42, 157, 143, 0.5);
+        }
+        
+        /* 로딩 스피너 */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 모달 공통 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            background-color: #111827; /* gray-900 */
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* 이미지 확대 모달 스타일 */
+        #image-zoom-modal-content {
+            background: none;
+            width: 95%;
+            height: 95%;
+            padding: 0;
+            border: none;
+        }
+        #image-zoom-modal-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        #image-zoom-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    </style>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+</head>
+<body class="antialiased">
+
+    <!-- API 키 입력 모달 -->
+    <div id="api-key-modal" class="modal-overlay hidden opacity-0">
+        <div class="modal-content space-y-4">
+            <h3 class="text-xl font-bold text-accent">Gemini API 키 설정</h3>
+            <p class="text-gray-400 text-sm">AIFI 바나나를 사용하려면 Gemini API 키가 필요합니다. Google AI Studio에서 API 키를 발급받아 아래에 입력해주세요.</p>
+            <div>
+                <label for="api-key-input" class="block text-sm font-medium text-gray-300 mb-1">API 키</label>
+                <input type="password" id="api-key-input" class="form-input" placeholder="여기에 API 키를 붙여넣으세요">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-api-key-btn" class="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-500 transition">취소</button>
+                <button id="save-api-key-btn" class="px-4 py-2 bg-primary rounded-md hover:opacity-90 transition">저장하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이미지 확대 모달 -->
+    <div id="image-zoom-modal" class="modal-overlay hidden opacity-0">
+        <div id="image-zoom-modal-content">
+            <img id="zoomed-image" src="" alt="Zoomed Image">
+            <div id="image-zoom-close-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8 relative">
+            <h1 class="text-4xl md:text-5xl font-bold">
+                <span class="text-primary">AIFI</span><span class="text-accent"> 바나나</span>
+            </h1>
+            <p class="text-gray-400 mt-2">AI로 일관성 있는 이미지를 만들고 수정하세요.</p>
+            <button id="settings-btn" class="absolute top-0 right-0 p-2 text-gray-400 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0 3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </button>
+        </header>
+
+        <!-- 탭 메뉴 -->
+        <div class="flex justify-center border-b border-gray-700 mb-8">
+            <div id="tab-shot" class="tab active" onclick="switchTab('shot')">샷 이미지 만들기</div>
+            <div id="tab-edit" class="tab" onclick="switchTab('edit')">이미지 수정</div>
+        </div>
+
+        <!-- 탭 컨텐츠 -->
+        <main>
+            <!-- 샷 이미지 만들기 탭 -->
+            <div id="content-shot">
+                <h2 class="text-2xl font-bold text-accent mb-4 text-center">일관성 있는 샷 이미지 만들기</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- 왼쪽: 업로드 및 프롬프트 -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="font-semibold mb-2 block">1. 이미지 업로드 (최대 8개)</label>
+                            <div id="shot-dropzone" class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition">
+                                <p class="text-gray-400">+ 이미지를 여기에 드래그하거나 클릭하여 업로드</p>
+                                <input type="file" id="shot-file-input" class="hidden" multiple accept="image/*">
+                            </div>
+                            <div id="shot-thumbnails" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+                        </div>
+                        <div>
+                            <label for="shot-prompt" class="font-semibold mb-2 block">2. 블록화 프롬프트 입력</label>
+                            <textarea id="shot-prompt" rows="8" class="form-textarea text-sm" placeholder="각 요소를 세미콜론(;)으로 구분하여 입력하세요.&#10;예:&#10;STYLE: 시네마틱 픽사 애니메이션 스타일;&#10;SCENE: 소년과 소녀가 카페 테이블에 앉아있다;&#10;CHARACTER_1: 교복 입은 한국 소년;"></textarea>
+                        </div>
+                        <button id="shot-generate-btn" class="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            이미지 생성하기 🚀
+                        </button>
+                    </div>
+                    <!-- 오른쪽: 결과 표시 -->
+                    <div id="shot-result-area" class="bg-gray-900 rounded-lg flex flex-col items-center justify-center min-h-[400px] p-4 border border-gray-800 relative">
+                        <div id="shot-result-placeholder" class="text-center text-gray-500">
+                            <p>생성된 이미지가 여기에 표시됩니다.</p>
+                        </div>
+                        <div id="shot-loading" class="hidden text-center">
+                            <div class="loader mx-auto"></div>
+                            <p class="mt-4" id="shot-loading-message">AI가 새로운 샷을 구상하고 있습니다...</p>
+                        </div>
+                        <img id="shot-result-image" class="hidden max-w-full max-h-full rounded-md object-contain">
+                        <div id="shot-result-actions" class="absolute bottom-4 flex space-x-2 hidden">
+                             <button id="shot-edit-btn" class="bg-accent text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">수정</button>
+                             <button id="shot-upscale-btn" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">업스케일</button>
+                             <button id="shot-zoom-btn" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">확대</button>
+                             <button id="shot-download-btn" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 이미지 수정 탭 -->
+            <div id="content-edit" class="hidden">
+                 <h2 class="text-2xl font-bold text-accent mb-4 text-center">블록 프롬프트 수정</h2>
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                     <!-- 왼쪽: 이미지 표시 -->
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-[300px]">
+                            <div class="bg-gray-900 rounded-lg flex flex-col items-center justify-center p-2 border border-gray-800 relative">
+                                <h3 class="font-semibold mb-2">수정할 이미지</h3>
+                                <div class="w-full h-full flex items-center justify-center">
+                                     <img id="edit-source-image" class="max-w-full max-h-full rounded-md object-contain">
+                                </div>
+                                 <div id="edit-source-actions" class="absolute bottom-2 flex space-x-2 hidden">
+                                     <button id="edit-source-zoom-btn" class="bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">확대</button>
+                                     <button id="edit-source-download-btn" class="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">저장</button>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg flex flex-col items-center justify-center p-2 border border-gray-800 relative">
+                                <h3 class="font-semibold mb-2">수정된 이미지</h3>
+                                <div id="edit-result-area" class="w-full h-full flex items-center justify-center">
+                                    <div id="edit-result-placeholder" class="text-gray-500 text-sm">수정 결과가 여기에 표시됩니다.</div>
+                                     <div id="edit-loading" class="hidden text-center">
+                                        <div class="loader mx-auto"></div>
+                                        <p class="mt-2 text-sm" id="edit-loading-message">이미지를 수정 중입니다...</p>
+                                    </div>
+                                    <img id="edit-result-image" class="hidden max-w-full max-h-full rounded-md object-contain">
+                                </div>
+                                <div id="edit-result-actions" class="absolute bottom-2 flex space-x-2 hidden">
+                                     <button id="edit-result-upscale-btn" class="bg-blue-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">업스케일</button>
+                                     <button id="edit-result-zoom-btn" class="bg-gray-600 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">확대</button>
+                                     <button id="edit-result-download-btn" class="bg-green-500 text-white text-xs font-bold py-1 px-2 rounded-lg hover:opacity-90 transition">저장</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 오른쪽: 동적 프롬프트 블록 -->
+                     <div class="space-y-4">
+                        <div id="edit-prompt-blocks" class="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                            <!-- 동적 블록이 여기에 추가됩니다 -->
+                        </div>
+                         <button id="edit-apply-btn" class="w-full bg-accent text-white font-bold py-3 px-4 rounded-lg hover:opacity-90 transition">
+                           수정 내용 적용하기
+                        </button>
+                     </div>
+                 </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 상태 관리 ---
+            let activeTab = 'shot';
+            let shotFiles = []; 
+            const MAX_SHOT_FILES = 8;
+            let GEMINI_API_KEY = localStorage.getItem('GEMINI_API_KEY');
+            let currentShotResultBase64 = null;
+            let currentEditSourceBase64 = null;
+            let currentEditResultBase64 = null;
+            let currentBlockPrompt = "";
+
+            // --- DOM 요소 캐싱 ---
+            const elements = {
+                apiKeyModal: document.getElementById('api-key-modal'),
+                imageZoomModal: document.getElementById('image-zoom-modal'),
+                zoomedImage: document.getElementById('zoomed-image'),
+                apiKeyInput: document.getElementById('api-key-input'),
+                settingsBtn: document.getElementById('settings-btn'),
+                cancelApiKeyBtn: document.getElementById('cancel-api-key-btn'),
+                saveApiKeyBtn: document.getElementById('save-api-key-btn'),
+                imageZoomCloseBtn: document.getElementById('image-zoom-close-btn'),
+                shotDropzone: document.getElementById('shot-dropzone'),
+                shotFileInput: document.getElementById('shot-file-input'),
+                shotThumbnails: document.getElementById('shot-thumbnails'),
+                shotGenerateBtn: document.getElementById('shot-generate-btn'),
+                shotLoading: document.getElementById('shot-loading'),
+                shotLoadingMessage: document.getElementById('shot-loading-message'),
+                shotResultPlaceholder: document.getElementById('shot-result-placeholder'),
+                shotResultImage: document.getElementById('shot-result-image'),
+                shotResultActions: document.getElementById('shot-result-actions'),
+                shotEditBtn: document.getElementById('shot-edit-btn'),
+                shotZoomBtn: document.getElementById('shot-zoom-btn'),
+                shotDownloadBtn: document.getElementById('shot-download-btn'),
+                shotUpscaleBtn: document.getElementById('shot-upscale-btn'),
+                editSourceImage: document.getElementById('edit-source-image'),
+                editPromptBlocksContainer: document.getElementById('edit-prompt-blocks'),
+                editApplyBtn: document.getElementById('edit-apply-btn'),
+                editLoading: document.getElementById('edit-loading'),
+                editLoadingMessage: document.getElementById('edit-loading-message'),
+                editResultPlaceholder: document.getElementById('edit-result-placeholder'),
+                editResultImage: document.getElementById('edit-result-image'),
+                editResultActions: document.getElementById('edit-result-actions'),
+                editSourceActions: document.getElementById('edit-source-actions'),
+                editSourceZoomBtn: document.getElementById('edit-source-zoom-btn'),
+                editSourceDownloadBtn: document.getElementById('edit-source-download-btn'),
+                editResultUpscaleBtn: document.getElementById('edit-result-upscale-btn'),
+                editResultZoomBtn: document.getElementById('edit-result-zoom-btn'),
+                editResultDownloadBtn: document.getElementById('edit-result-download-btn'),
+            };
+
+            // --- API 호출 함수 ---
+            const API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
+
+            async function callApiWithExponentialBackoff(apiUrl, requestBody, isImageApi = false) {
+                if (!GEMINI_API_KEY) {
+                    alert("API 키가 설정되지 않았습니다.");
+                    showApiKeyModal();
+                    return { success: false };
+                }
+                // ... (이하 API 호출 로직은 이전과 동일)
+                let attempt = 0;
+                const maxAttempts = 5;
+                let delay = 1000;
+
+                while (attempt < maxAttempts) {
+                    try {
+                        const response = await fetch(`${apiUrl}?key=${GEMINI_API_KEY}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(requestBody)
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (isImageApi) {
+                                const imagePart = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                                if (!imagePart) throw new Error("No image data in response");
+                                return { success: true, base64Data: imagePart.inlineData.data };
+                            } else {
+                                const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                                if (!translatedText) throw new Error("No text data in response");
+                                return { success: true, text: translatedText };
+                            }
+                        } else if (response.status === 429 || response.status >= 500) {
+                            console.warn(`Attempt ${attempt + 1} failed with status ${response.status}. Retrying in ${delay}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            delay *= 2;
+                            attempt++;
+                        } else {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                    } catch (error) {
+                        console.error("API call error:", error);
+                        const alertMessage = isImageApi ? "이미지 생성/수정 중 오류가 발생했습니다. API 키, 프롬프트, 이미지를 확인해주세요." : "번역 중 오류가 발생했습니다.";
+                        alert(alertMessage);
+                        return { success: false };
+                    }
+                }
+                alert("API 호출에 여러 번 실패했습니다. 잠시 후 다시 시도해주세요.");
+                return { success: false };
+            }
+
+            async function translateTexts(textsToTranslate) {
+                if (!textsToTranslate || textsToTranslate.length === 0) return {};
+                const url = `${API_BASE_URL}gemini-2.5-flash-preview-05-20:generateContent`;
+                const prompt = `Translate the following Korean phrases to English. Provide only the translated text, preserving the original order. Input: [${textsToTranslate.join(", ")}]`;
+                const result = await callApiWithExponentialBackoff(url, { contents: [{ parts: [{ text: prompt }] }] });
+                if (result.success) {
+                    const translatedArray = result.text.replace(/\[|\]/g, '').split(',').map(t => t.trim());
+                    const translationMap = {};
+                    textsToTranslate.forEach((original, index) => {
+                        translationMap[original] = translatedArray[index] || original;
+                    });
+                    return translationMap;
+                }
+                return null;
+            }
+
+            async function generateImage(payload) {
+                const url = `${API_BASE_URL}gemini-2.5-flash-image-preview:generateContent`;
+                const requestBody = { contents: [{ parts: [{ text: payload.prompt }, ...payload.images.map(imgData => ({ inline_data: { mime_type: "image/jpeg", data: imgData } }))] }]};
+                return await callApiWithExponentialBackoff(url, requestBody, true);
+            }
+
+            // --- UI 함수 (모달, 탭) ---
+            function showApiKeyModal() { elements.apiKeyInput.value = GEMINI_API_KEY || ''; elements.apiKeyModal.classList.remove('hidden'); setTimeout(() => elements.apiKeyModal.classList.remove('opacity-0'), 10); }
+            function hideApiKeyModal() { elements.apiKeyModal.classList.add('opacity-0'); setTimeout(() => elements.apiKeyModal.classList.add('hidden'), 300); }
+            function showImageModal(base64Data) { elements.zoomedImage.src = `data:image/png;base64,${base64Data}`; elements.imageZoomModal.classList.remove('hidden'); setTimeout(() => elements.imageZoomModal.classList.remove('opacity-0'), 10); }
+            function hideImageModal() { elements.imageZoomModal.classList.add('opacity-0'); setTimeout(() => elements.imageZoomModal.classList.add('hidden'), 300); }
+            
+            window.switchTab = (tabName, data = {}) => {
+                activeTab = tabName;
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById(`tab-${tabName}`).classList.add('active');
+                document.querySelectorAll('main > div').forEach(c => c.classList.add('hidden'));
+                document.getElementById(`content-${tabName}`).classList.remove('hidden');
+                if (tabName === 'edit') setupEditTab(data.imageBase64, data.prompt);
+            }
+
+            // --- 유틸리티 함수 ---
+            const fileToBase64 = file => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+
+            function downloadImage(base64Data, filename = 'aifi-banana-image.png') {
+                const link = document.createElement('a');
+                link.href = `data:image/png;base64,${base64Data}`;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+             async function processAndAssemblePrompt(promptText) {
+                const blocks = promptText.split(';').map(b => b.trim()).filter(b => b.includes(':'));
+                const promptData = {};
+                const koreanValues = [];
+                const koreanRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+                blocks.forEach(block => {
+                    const parts = block.split(/:(.*)/s);
+                    if (parts.length >= 2) {
+                        const key = parts[0].trim().toUpperCase();
+                        const value = parts[1].trim();
+                        if (key && value) { promptData[key] = value; if (koreanRegex.test(value)) koreanValues.push(value); }
+                    }
+                });
+                let translationMap = {};
+                if (koreanValues.length > 0) {
+                    translationMap = await translateTexts(Array.from(new Set(koreanValues)));
+                    if (!translationMap) return null;
+                }
+                return Object.entries(promptData).map(([key, value]) => `${key}: ${translationMap[value] || value}`).join('; ');
+            }
+
+            // --- 이벤트 리스너 설정 ---
+            elements.settingsBtn.addEventListener('click', showApiKeyModal);
+            elements.cancelApiKeyBtn.addEventListener('click', hideApiKeyModal);
+            elements.imageZoomCloseBtn.addEventListener('click', hideImageModal);
+            elements.saveApiKeyBtn.addEventListener('click', () => {
+                const newKey = elements.apiKeyInput.value.trim();
+                if (newKey) { GEMINI_API_KEY = newKey; localStorage.setItem('GEMINI_API_KEY', newKey); alert('API 키가 저장되었습니다.'); hideApiKeyModal(); } 
+                else { alert('API 키를 입력해주세요.'); }
+            });
+
+            // '샷 이미지 만들기' 이벤트 리스너
+            elements.shotDropzone.addEventListener('click', () => elements.shotFileInput.click());
+            elements.shotDropzone.addEventListener('dragover', e => e.preventDefault());
+            elements.shotDropzone.addEventListener('drop', e => { e.preventDefault(); handleShotFiles(e.dataTransfer.files); });
+            elements.shotFileInput.addEventListener('change', e => handleShotFiles(e.target.files));
+            elements.shotGenerateBtn.addEventListener('click', onShotGenerate);
+            elements.shotEditBtn.addEventListener('click', () => { if (currentShotResultBase64 && currentBlockPrompt) switchTab('edit', { imageBase64: currentShotResultBase64, prompt: currentBlockPrompt }); });
+            elements.shotZoomBtn.addEventListener('click', () => { if (currentShotResultBase64) showImageModal(currentShotResultBase64); });
+            elements.shotDownloadBtn.addEventListener('click', () => { if (currentShotResultBase64) downloadImage(currentShotResultBase64); });
+            elements.shotUpscaleBtn.addEventListener('click', onShotUpscale);
+
+            // '이미지 수정' 이벤트 리스너
+            elements.editApplyBtn.addEventListener('click', onEditApply);
+            elements.editSourceZoomBtn.addEventListener('click', () => { if(currentEditSourceBase64) showImageModal(currentEditSourceBase64); });
+            elements.editSourceDownloadBtn.addEventListener('click', () => { if(currentEditSourceBase64) downloadImage(currentEditSourceBase64, 'aifi-banana-source.png'); });
+            elements.editResultZoomBtn.addEventListener('click', () => { if(currentEditResultBase64) showImageModal(currentEditResultBase64); });
+            elements.editResultDownloadBtn.addEventListener('click', () => { if(currentEditResultBase64) downloadImage(currentEditResultBase64, 'aifi-banana-edited.png'); });
+            elements.editResultUpscaleBtn.addEventListener('click', onEditUpscale);
+            
+            // --- '샷 이미지 만들기' 관련 함수 ---
+            async function handleShotFiles(files) {
+                const newFiles = Array.from(files).slice(0, MAX_SHOT_FILES - shotFiles.length);
+                for (const file of newFiles) shotFiles.push({ name: file.name, data: await fileToBase64(file) });
+                renderShotThumbnails();
+                updateShotBtnState();
+            }
+            function renderShotThumbnails() {
+                elements.shotThumbnails.innerHTML = '';
+                shotFiles.forEach((file, index) => {
+                    const thumbDiv = document.createElement('div');
+                    thumbDiv.className = 'relative group';
+                    thumbDiv.innerHTML = `<img src="data:image/jpeg;base64,${file.data}" class="w-full h-24 object-cover rounded-md ${index === 0 ? 'border-2 border-accent' : ''}"><div class="absolute top-0 right-0 m-1 p-0.5 bg-red-500 rounded-full text-white cursor-pointer opacity-0 group-hover:opacity-100" onclick="removeShotFile(${index})"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></div> ${index === 0 ? '<div class="absolute bottom-0 text-xs bg-accent text-white px-1 rounded-t-sm">기준</div>' : ''}`;
+                    elements.shotThumbnails.appendChild(thumbDiv);
+                });
+            }
+            window.removeShotFile = (index) => { shotFiles.splice(index, 1); renderShotThumbnails(); updateShotBtnState(); }
+            function updateShotBtnState() { elements.shotGenerateBtn.disabled = shotFiles.length === 0; }
+
+            async function onShotGenerate() {
+                if (!GEMINI_API_KEY) { showApiKeyModal(); return; }
+                const promptText = document.getElementById('shot-prompt').value.trim();
+                if (!promptText) { alert('블록화 프롬프트를 입력해주세요.'); return; }
+
+                elements.shotLoading.classList.remove('hidden');
+                elements.shotResultPlaceholder.classList.add('hidden');
+                elements.shotResultImage.classList.add('hidden');
+                elements.shotResultActions.classList.add('hidden');
+                elements.shotLoadingMessage.innerText = "프롬프트를 분석하고 번역하는 중...";
+
+                const finalPrompt = await processAndAssemblePrompt(promptText);
+                if (finalPrompt === null) {
+                    elements.shotLoading.classList.add('hidden');
+                    elements.shotResultPlaceholder.innerText = '프롬프트 번역에 실패했습니다.';
+                    elements.shotResultPlaceholder.classList.remove('hidden');
+                    return;
+                }
+                
+                elements.shotLoadingMessage.innerText = "AI가 새로운 샷을 구상하고 있습니다...";
+                const payload = { images: shotFiles.map(f => f.data), prompt: `Maintain character and style consistency from uploaded images. Create a new image based on: ${finalPrompt}` };
+                const result = await generateImage(payload);
+
+                elements.shotLoading.classList.add('hidden');
+                if (result.success) {
+                    currentShotResultBase64 = result.base64Data;
+                    currentBlockPrompt = promptText;
+                    elements.shotResultImage.src = `data:image/png;base64,${result.base64Data}`;
+                    elements.shotResultImage.classList.remove('hidden');
+                    elements.shotResultActions.classList.remove('hidden');
+                } else {
+                    elements.shotResultPlaceholder.innerText = '이미지 생성에 실패했습니다.';
+                    elements.shotResultPlaceholder.classList.remove('hidden');
+                }
+            }
+            async function onShotUpscale() {
+                if (!currentShotResultBase64) return;
+                elements.shotLoadingMessage.innerText = "이미지를 업스케일링 하는 중...";
+                elements.shotLoading.classList.remove('hidden');
+                elements.shotResultActions.classList.add('hidden');
+                const payload = { images: [currentShotResultBase64], prompt: "Upscale this image to a higher resolution (e.g., 2x), enhancing details and clarity without changing the content or style." };
+                const result = await generateImage(payload);
+                elements.shotLoading.classList.add('hidden');
+                if (result.success) {
+                    currentShotResultBase64 = result.base64Data;
+                    elements.shotResultImage.src = `data:image/png;base64,${result.base64Data}`;
+                }
+                elements.shotResultActions.classList.remove('hidden');
+            }
+
+            // --- '이미지 수정' 관련 함수 ---
+            function setupEditTab(imageBase64, promptText) {
+                currentEditSourceBase64 = imageBase64;
+                elements.editSourceImage.src = `data:image/png;base64,${imageBase64}`;
+                elements.editSourceActions.classList.remove('hidden');
+                
+                elements.editPromptBlocksContainer.innerHTML = '';
+                const blocks = promptText.split(';').map(b => b.trim()).filter(b => b.includes(':'));
+                blocks.forEach(block => {
+                    const parts = block.split(/:(.*)/s);
+                    if (parts.length < 2) return;
+                    const [key, value] = [parts[0].trim(), parts[1].trim()];
+                    elements.editPromptBlocksContainer.innerHTML += `<div><label class="text-sm font-medium text-gray-300">${key}</label><input type="text" data-key="${key}" value="${value}" class="form-input mt-1"></div>`;
+                });
+
+                elements.editResultImage.classList.add('hidden');
+                elements.editResultPlaceholder.classList.remove('hidden');
+                elements.editResultActions.classList.add('hidden');
+            }
+
+            async function onEditApply() {
+                if (!GEMINI_API_KEY) { showApiKeyModal(); return; }
+                let newPromptText = Array.from(elements.editPromptBlocksContainer.querySelectorAll('input[data-key]'))
+                    .map(input => {
+                        const value = input.value.trim();
+                        return value ? `${input.dataset.key}: ${value};` : '';
+                    }).join(' ').trim();
+
+                if (!newPromptText) { alert("수정할 프롬프트가 없습니다."); return; }
+
+                elements.editLoading.classList.remove('hidden');
+                elements.editResultPlaceholder.classList.add('hidden');
+                elements.editResultImage.classList.add('hidden');
+                elements.editResultActions.classList.add('hidden');
+                elements.editLoadingMessage.innerText = "수정된 프롬프트를 번역하는 중...";
+
+                const finalPrompt = await processAndAssemblePrompt(newPromptText);
+                if (finalPrompt === null) {
+                    elements.editLoading.classList.add('hidden');
+                    elements.editResultPlaceholder.innerText = '프롬프트 번역에 실패했습니다.';
+                    elements.editResultPlaceholder.classList.remove('hidden');
+                    return;
+                }
+
+                elements.editLoadingMessage.innerText = "이미지를 수정하고 있습니다...";
+                const payload = { images: [currentEditSourceBase64], prompt: `Modify the source image based on these instructions, maintaining overall consistency: ${finalPrompt}` };
+                const result = await generateImage(payload);
+
+                elements.editLoading.classList.add('hidden');
+                if (result.success) {
+                    currentEditResultBase64 = result.base64Data;
+                    elements.editResultImage.src = `data:image/png;base64,${result.base64Data}`;
+                    elements.editResultImage.classList.remove('hidden');
+                    elements.editResultActions.classList.remove('hidden');
+                } else {
+                    elements.editResultPlaceholder.innerText = '이미지 수정에 실패했습니다.';
+                    elements.editResultPlaceholder.classList.remove('hidden');
+                }
+            }
+             async function onEditUpscale() {
+                if (!currentEditResultBase64) return;
+                elements.editLoadingMessage.innerText = "이미지를 업스케일링 하는 중...";
+                elements.editLoading.classList.remove('hidden');
+                elements.editResultActions.classList.add('hidden');
+                const payload = { images: [currentEditResultBase64], prompt: "Upscale this image to a higher resolution (e.g., 2x), enhancing details and clarity without changing the content or style." };
+                const result = await generateImage(payload);
+                elements.editLoading.classList.add('hidden');
+                if (result.success) {
+                    currentEditResultBase64 = result.base64Data;
+                    elements.editResultImage.src = `data:image/png;base64,${result.base64Data}`;
+                }
+                elements.editResultActions.classList.remove('hidden');
+            }
+
+            // --- 초기화 ---
+            updateShotBtnState();
+        });
+    </script>
+</body>
+</html>
+

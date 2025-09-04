@@ -1,9 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GoogleGenAI, Modality } from '@google/genai';
-import { IconUpload, IconEdit, IconDownload, IconLoader2, IconSparkles, IconWand } from '@tabler/icons-react';
+import { IconUpload, IconEdit, IconDownload, IconLoader2, IconWand, IconPlus, IconX, IconTrash, IconSparkles } from '@tabler/icons-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Textarea } from '../components/ui/Input';
 import { Image } from 'lucide-react';
 
 const Loader = ({ message }: { message: string }) => (
@@ -15,14 +14,63 @@ const Loader = ({ message }: { message: string }) => (
 
 interface TextEditorProps {
     ai: GoogleGenAI;
+    initialImage?: string;
+    initialPrompt?: string;
+    onNavigateToShot?: () => void;
 }
 
-export const TextEditor: React.FC<TextEditorProps> = ({ ai }) => {
+interface PromptBlock {
+    key: string;
+    value: string;
+    id: string;
+}
+
+export const TextEditor: React.FC<TextEditorProps> = ({ ai, initialImage, initialPrompt, onNavigateToShot }) => {
     const [sourceImage, setSourceImage] = useState<string | null>(null);
-    const [editPrompt, setEditPrompt] = useState('배경을 바다로 바꿔주세요');
+    const [promptBlocks, setPromptBlocks] = useState<PromptBlock[]>([]);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState('');
+
+    // Set initial values when received from ShotGenerator
+    useEffect(() => {
+        if (initialImage) {
+            // Convert base64 to data URL format
+            setSourceImage(`data:image/png;base64,${initialImage}`);
+            setResultImage(null);
+        }
+        if (initialPrompt) {
+            // Parse block prompt into individual blocks
+            const blocks = initialPrompt.split(';').map(b => b.trim()).filter(b => b.includes(':'));
+            const parsedBlocks = blocks.map((block, index) => {
+                const parts = block.split(/:(.*)/s);
+                if (parts.length >= 2) {
+                    return {
+                        key: parts[0].trim().toUpperCase(),
+                        value: parts[1].trim(),
+                        id: `block-${Date.now()}-${index}`
+                    };
+                }
+                return null;
+            }).filter(b => b !== null) as PromptBlock[];
+            
+            if (parsedBlocks.length > 0) {
+                setPromptBlocks(parsedBlocks);
+            } else {
+                // Default blocks if no prompt provided
+                setPromptBlocks([
+                    { key: 'STYLE', value: '원본 스타일 유지', id: `block-${Date.now()}-1` },
+                    { key: 'EDIT', value: '배경을 바꿔주세요', id: `block-${Date.now()}-2` }
+                ]);
+            }
+        } else if (!initialPrompt && !initialImage) {
+            // Default blocks for new edit
+            setPromptBlocks([
+                { key: 'STYLE', value: '원본 스타일 유지', id: `block-${Date.now()}-1` },
+                { key: 'EDIT', value: '배경을 바다로 바꿔주세요', id: `block-${Date.now()}-2` }
+            ]);
+        }
+    }, [initialImage, initialPrompt]);
 
     const fileToBase64 = (file: File): Promise<{ data: string; type: string }> => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -97,13 +145,37 @@ export const TextEditor: React.FC<TextEditorProps> = ({ ai }) => {
         }
     };
 
+    const updateBlock = (id: string, field: 'key' | 'value', value: string) => {
+        setPromptBlocks(prev => prev.map(block => 
+            block.id === id ? { ...block, [field]: value } : block
+        ));
+    };
+
+    const addBlock = () => {
+        const newBlock: PromptBlock = {
+            key: 'NEW',
+            value: '',
+            id: `block-${Date.now()}`
+        };
+        setPromptBlocks(prev => [...prev, newBlock]);
+    };
+
+    const removeBlock = (id: string) => {
+        setPromptBlocks(prev => prev.filter(block => block.id !== id));
+    };
+
     const handleEdit = async () => {
-        if (!sourceImage || !editPrompt.trim()) return;
+        if (!sourceImage || promptBlocks.length === 0) return;
         
         setIsLoading(true);
         setLoadingMessage("AI가 이미지를 편집하고 있습니다...");
         
-        const prompt = `Edit this image based on the following instruction: "${editPrompt}". 
+        // Assemble prompt from blocks
+        const editInstruction = promptBlocks
+            .map(block => `${block.key}: ${block.value}`)
+            .join('; ');
+        
+        const prompt = `Edit this image based on the following instructions: ${editInstruction}. 
         Maintain the overall composition and quality while applying the requested changes naturally and realistically.`;
         
         // Extract base64 data
@@ -128,25 +200,24 @@ export const TextEditor: React.FC<TextEditorProps> = ({ ai }) => {
         document.body.removeChild(link);
     };
 
-    const promptSuggestions = [
-        "배경을 바다로 바꿔주세요",
-        "하늘을 노을로 만들어주세요",
-        "사람의 옷 색깔을 빨간색으로 바꿔주세요",
-        "흑백 사진으로 변환해주세요",
-        "빈티지 필터를 적용해주세요",
-        "배경을 흐리게 처리해주세요",
-        "더 밝게 만들어주세요",
-        "봄 느낌으로 편집해주세요"
-    ];
-
     return (
         <div className="container mx-auto p-4 md:p-8">
-            <h2 className="text-3xl font-bold mb-8 text-center flex items-center justify-center gap-3">
-                <IconEdit size={36} className="text-emerald-500" />
-                <span className="bg-gradient-to-r from-emerald-400 to-green-600 bg-clip-text text-transparent">
-                    글로 쓰는 편집기
-                </span>
-            </h2>
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-bold text-center flex items-center gap-3">
+                    <IconEdit size={36} className="text-emerald-500" />
+                    <span className="bg-gradient-to-r from-emerald-400 to-green-600 bg-clip-text text-transparent">
+                        글로 쓰는 편집기
+                    </span>
+                </h2>
+                <Button
+                    onClick={onNavigateToShot}
+                    variant="ghost"
+                    leftIcon={<IconSparkles size={20} />}
+                    className="text-orange-400 hover:text-orange-300"
+                >
+                    샷 이미지 생성으로 이동
+                </Button>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Input Section */}
@@ -170,6 +241,10 @@ export const TextEditor: React.FC<TextEditorProps> = ({ ai }) => {
                                             e.stopPropagation();
                                             setSourceImage(null);
                                             setResultImage(null);
+                                            setPromptBlocks([
+                                                { key: 'STYLE', value: '원본 스타일 유지', id: `block-${Date.now()}-1` },
+                                                { key: 'EDIT', value: '배경을 바꿔주세요', id: `block-${Date.now()}-2` }
+                                            ]);
                                         }}
                                         variant="danger"
                                         size="xs"
@@ -194,41 +269,69 @@ export const TextEditor: React.FC<TextEditorProps> = ({ ai }) => {
                         </div>
                     </Card>
 
-                    {/* Text Input */}
+                    {/* Block Editor */}
                     <Card variant="elevated" className="p-6">
-                        <h3 className="font-semibold mb-4 text-gray-200 flex items-center gap-2">
-                            <span className="text-emerald-500">2.</span> 편집 명령어 입력
-                        </h3>
-                        <Textarea
-                            value={editPrompt}
-                            onChange={(e) => setEditPrompt(e.target.value)}
-                            placeholder="어떻게 편집하고 싶은지 자연스럽게 써주세요..."
-                            rows={4}
-                            variant="filled"
-                            className="mb-4"
-                        />
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-semibold text-gray-200 flex items-center gap-2">
+                                <span className="text-emerald-500">2.</span> 블록 편집 명령어
+                            </h3>
+                            <Button
+                                onClick={addBlock}
+                                variant="ghost"
+                                size="xs"
+                                leftIcon={<IconPlus size={16} />}
+                                className="text-emerald-400 hover:text-emerald-300"
+                            >
+                                블록 추가
+                            </Button>
+                        </div>
                         
-                        {/* Quick Suggestions */}
-                        <div className="space-y-2">
-                            <h4 className="text-sm font-medium text-gray-400">빠른 제안</h4>
-                            <div className="flex flex-wrap gap-2">
-                                {promptSuggestions.map((suggestion, index) => (
+                        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                            {promptBlocks.map((block) => (
+                                <div key={block.id} className="flex gap-2 items-start group">
+                                    <input
+                                        type="text"
+                                        value={block.key}
+                                        onChange={(e) => updateBlock(block.id, 'key', e.target.value.toUpperCase())}
+                                        placeholder="KEY"
+                                        className="w-1/4 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-emerald-400 font-mono text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={block.value}
+                                        onChange={(e) => updateBlock(block.id, 'value', e.target.value)}
+                                        placeholder="값을 입력하세요..."
+                                        className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
+                                    />
                                     <button
-                                        key={index}
-                                        onClick={() => setEditPrompt(suggestion)}
-                                        className="text-xs px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full hover:bg-emerald-500/30 transition-colors"
+                                        onClick={() => removeBlock(block.id)}
+                                        className="p-2 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
-                                        {suggestion}
+                                        <IconTrash size={18} />
                                     </button>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
+                            
+                            {promptBlocks.length === 0 && (
+                                <div className="text-center py-8 text-gray-500">
+                                    <p className="mb-2">편집 블록이 없습니다</p>
+                                    <Button
+                                        onClick={addBlock}
+                                        variant="ghost"
+                                        size="sm"
+                                        leftIcon={<IconPlus size={16} />}
+                                    >
+                                        첫 번째 블록 추가하기
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </Card>
 
                     {/* Edit Button */}
                     <Button
                         onClick={handleEdit}
-                        disabled={!sourceImage || !editPrompt.trim() || isLoading}
+                        disabled={!sourceImage || promptBlocks.length === 0 || isLoading}
                         isLoading={isLoading}
                         size="lg"
                         fullWidth
@@ -239,18 +342,31 @@ export const TextEditor: React.FC<TextEditorProps> = ({ ai }) => {
                         {isLoading ? '편집 중...' : '이미지 편집하기'}
                     </Button>
 
-                    {/* Tips */}
+                    {/* Block Guide */}
                     <Card variant="glass" className="p-4">
-                        <h4 className="font-semibold text-gray-300 mb-2 flex items-center gap-2">
-                            <IconSparkles size={16} />
-                            편집 팁
-                        </h4>
-                        <ul className="space-y-1 text-sm text-gray-500">
-                            <li>• 구체적인 명령어를 사용하세요 (예: "하늘을 파란색으로")</li>
-                            <li>• 한 번에 하나의 편집 요청을 해보세요</li>
-                            <li>• 자연스러운 한국어 문장으로 작성하세요</li>
-                            <li>• 색상, 배경, 효과 등을 명확하게 지정하세요</li>
-                        </ul>
+                        <h4 className="font-semibold text-gray-300 mb-2">편집 블록 가이드</h4>
+                        <div className="space-y-2 text-sm text-gray-500">
+                            <div className="flex gap-2">
+                                <span className="text-emerald-400 font-mono">STYLE:</span>
+                                <span>스타일 유지 또는 변경</span>
+                            </div>
+                            <div className="flex gap-2">
+                                <span className="text-emerald-400 font-mono">EDIT:</span>
+                                <span>수정할 내용</span>
+                            </div>
+                            <div className="flex gap-2">
+                                <span className="text-emerald-400 font-mono">SCENE:</span>
+                                <span>장면 변경</span>
+                            </div>
+                            <div className="flex gap-2">
+                                <span className="text-emerald-400 font-mono">COLOR:</span>
+                                <span>색상 조정</span>
+                            </div>
+                            <div className="flex gap-2">
+                                <span className="text-emerald-400 font-mono">EFFECT:</span>
+                                <span>효과 추가</span>
+                            </div>
+                        </div>
                     </Card>
                 </div>
 
