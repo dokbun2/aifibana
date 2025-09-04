@@ -15,7 +15,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-pulse">
                     <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">AIFI</span>
                     <span className="bg-gradient-to-b from-green-400 to-orange-600 bg-clip-text text-transparent">와</span>
-                    <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent ml-2">나노바가 만났다.</span>
+                    <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent ml-2">나노바나나가 만났다.</span>
                 </h1>
                 <p className="text-xl text-gray-400 mb-8">
                     AI로 일관성 있는 이미지를 만들고 수정하세요
