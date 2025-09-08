@@ -194,26 +194,26 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             </span>
                         </div>
                         <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
-                            가상 옷 입히기
+                            AI 스튜디오
                         </h3>
                     </CardHeader>
                     <CardBody className="relative">
                         <p className="text-gray-400 mb-6">
-                            AI로 가상으로 옷을 입혀보세요. 
-                            사람 이미지와 옷 이미지를 업로드하면 자연스럽게 합성된 결과를 만들어드립니다.
+                            올인원 이미지 AI 스튜디오입니다.
+                            가상 착용, 이미지 합성, 이미지 편집 기능을 한 곳에서 사용하세요.
                         </p>
                         <ul className="space-y-2 mb-6 text-sm text-gray-500">
                             <li className="flex items-center gap-2">
-                                <span className="text-cyan-500">✓</span> 사실적인 옷 합성
+                                <span className="text-cyan-500">✓</span> 가상 착용 시뮬레이션
                             </li>
                             <li className="flex items-center gap-2">
-                                <span className="text-cyan-500">✓</span> 자연스러운 주름 표현
+                                <span className="text-cyan-500">✓</span> 고급 이미지 합성
                             </li>
                             <li className="flex items-center gap-2">
-                                <span className="text-cyan-500">✓</span> 체형에 맞는 피팅
+                                <span className="text-cyan-500">✓</span> 정밀 이미지 편집
                             </li>
                             <li className="flex items-center gap-2">
-                                <span className="text-cyan-500">✓</span> 빠른 처리 속도
+                                <span className="text-cyan-500">✓</span> 브러시 기반 영역 선택
                             </li>
                         </ul>
                         <Button 

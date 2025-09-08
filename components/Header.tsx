@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                             onClick={() => onNavigate('tryon')}
                             className={currentPage === 'tryon' ? 'bg-gradient-to-r from-cyan-500 to-blue-600' : ''}
                         >
-                            가상 착용
+                            AI 스튜디오
                         </Button>
                         <Button
                             variant="ghost"
