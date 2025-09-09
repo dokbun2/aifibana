@@ -74,7 +74,7 @@ export const AngleConverter: React.FC<AngleConverterProps> = ({ ai }) => {
             throw new Error("API 응답에서 이미지를 찾을 수 없습니다.");
         } catch (error) {
             console.error("Image API Error:", error);
-            alert("이미지 처리 중 오류가 발생했습니다. API 할당량을 확인하거나 잠시 후 다시 시도해주세요.");
+            alert("이미지 처리 중 오류발생. 구글 정책 제한 및 일일 할당량 확인 후 다시 시도해주세요.");
             return null;
         }
     }, [ai]);
