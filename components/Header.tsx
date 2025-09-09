@@ -105,10 +105,9 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                     <Button
                         variant={currentPage === 'tryon' ? 'primary' : 'ghost'}
                         size="sm"
-                        fullWidth
                         onClick={() => onNavigate('tryon')}
                     >
-                        가상 착용
+                        AI 스튜디오
                     </Button>
                 </div>
             </div>

@@ -23,7 +23,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
 
             {/* Feature Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-8xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-8xl mx-auto">
                 {/* Text Editor Card */}
                 <Card 
                     variant="glass" 
@@ -229,6 +229,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         </Button>
                     </CardBody>
                 </Card>
+
             </div>
 
             {/* Bottom CTA */}
