@@ -23,7 +23,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
 
             {/* Feature Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-8xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-w-full mx-auto">
                 {/* Text Editor Card */}
                 <Card 
                     variant="glass" 
@@ -32,15 +32,15 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <CardHeader className="relative">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 bg-emerald-500/20 rounded-xl">
-                                <IconEdit size={32} className="text-emerald-500" />
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="p-2 bg-emerald-500/20 rounded-lg">
+                                <IconEdit size={20} className="text-emerald-500" />
                             </div>
-                            <span className="text-xs bg-gradient-to-r from-emerald-500 to-green-500 text-white px-3 py-1 rounded-full font-medium animate-pulse">
+                            <span className="text-xs bg-gradient-to-r from-emerald-500 to-green-500 text-white px-2 py-0.5 rounded-full font-medium animate-pulse">
                                 NEW
                             </span>
                         </div>
-                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-emerald-400 to-green-600 bg-clip-text text-transparent">
+                        <h3 className="text-base font-bold mb-1 bg-gradient-to-r from-emerald-400 to-green-600 bg-clip-text text-transparent">
                             글로 쓰는 편집기
                         </h3>
                     </CardHeader>
@@ -85,15 +85,15 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <CardHeader className="relative">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 bg-orange-500/20 rounded-xl">
-                                <IconSparkles size={32} className="text-orange-500" />
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="p-2 bg-orange-500/20 rounded-lg">
+                                <IconSparkles size={20} className="text-orange-500" />
                             </div>
-                            <span className="text-xs bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full">
+                            <span className="text-xs bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded-full">
                                 인기
                             </span>
                         </div>
-                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+                        <h3 className="text-base font-bold mb-1 bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
                             샷 이미지 만들기
                         </h3>
                     </CardHeader>
@@ -135,15 +135,15 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <CardHeader className="relative">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 bg-purple-500/20 rounded-xl">
-                                <IconCamera size={32} className="text-purple-500" />
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="p-2 bg-purple-500/20 rounded-lg">
+                                <IconCamera size={20} className="text-purple-500" />
                             </div>
-                            <span className="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">
+                            <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">
                                 새기능
                             </span>
                         </div>
-                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+                        <h3 className="text-base font-bold mb-1 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
                             이미지 앵글 변환
                         </h3>
                     </CardHeader>
@@ -185,22 +185,22 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <CardHeader className="relative">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 bg-cyan-500/20 rounded-xl">
-                                <IconHanger size={32} className="text-cyan-500" />
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="p-2 bg-cyan-500/20 rounded-lg">
+                                <IconHanger size={20} className="text-cyan-500" />
                             </div>
-                            <span className="text-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-3 py-1 rounded-full font-medium">
+                            <span className="text-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">
                                 HOT
                             </span>
                         </div>
-                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
+                        <h3 className="text-base font-bold mb-1 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
                             AI 스튜디오
                         </h3>
                     </CardHeader>
                     <CardBody className="relative">
                         <p className="text-gray-400 mb-6">
                             올인원 이미지 AI 스튜디오입니다.
-                            가상 착용, 이미지 합성, 이미지 편집 기능을 한 곳에서 사용하세요.
+                            가상 착용, 이미지 합성, 이미지 편집 기능을 한 곳에서 사용하세요. 색다른 경험을 체험하세요. 
                         </p>
                         <ul className="space-y-2 mb-6 text-sm text-gray-500">
                             <li className="flex items-center gap-2">
@@ -238,15 +238,15 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <CardHeader className="relative">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 bg-purple-500/20 rounded-xl">
-                                <IconBrandFramer size={32} className="text-purple-500" />
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="p-2 bg-purple-500/20 rounded-lg">
+                                <IconBrandFramer size={20} className="text-purple-500" />
                             </div>
                             <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-medium animate-pulse">
                                 MULTI
                             </span>
                         </div>
-                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                        <h3 className="text-base font-bold mb-1 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
                             멀티바나나
                         </h3>
                     </CardHeader>
