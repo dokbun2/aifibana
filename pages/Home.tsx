@@ -45,11 +45,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         </h3>
                     </CardHeader>
                     <CardBody className="relative">
-                        <p className="text-gray-400 mb-6">
+                        <p className="text-xs text-gray-400 mb-2 line-clamp-2">
                             이제는 나노바나나에서 텍스트로 이미지를 편집하세요. 
                             자연어 명령 만으로 이미지를 수정, 변환, 보정할 수 있습니다.
                         </p>
-                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                        <ul className="space-y-1 mb-3 text-xs text-gray-500">
                             <li className="flex items-center gap-2">
                                 <span className="text-emerald-500">✓</span> 자연어 명령 처리
                             </li>
@@ -66,11 +66,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         <Button 
                             variant="primary" 
                             fullWidth 
-                            rightIcon={<IconArrowRight size={18} />}
+                            rightIcon={<IconArrowRight size={14} />}
                             className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white animate-pulse"
                         >
-                            <span className="font-bold flex items-center gap-2">
-                                <IconSparkles size={16} />
+                            <span className="text-xs font-bold flex items-center gap-1">
+                                <IconSparkles size={12} />
                                 시작하기
                             </span>
                         </Button>
@@ -98,11 +98,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         </h3>
                     </CardHeader>
                     <CardBody className="relative">
-                        <p className="text-gray-400 mb-6">
+                        <p className="text-xs text-gray-400 mb-2 line-clamp-2">
                             업로드한 이미지를 기반으로 일관성 있는 새로운 이미지를 생성합니다. 
                             캐릭터의 스타일,특징,다양한 장면과 각도의 이미지를 만드세요.
                         </p>
-                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                        <ul className="space-y-1 mb-3 text-xs text-gray-500">
                             <li className="flex items-center gap-2">
                                 <span className="text-orange-500">✓</span> 최대 8개 이미지 업로드
                             </li>
@@ -119,10 +119,10 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         <Button 
                             variant="primary" 
                             fullWidth 
-                            rightIcon={<IconArrowRight size={18} />}
+                            rightIcon={<IconArrowRight size={14} />}
                             className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
                         >
-                            <span className="font-bold">시작하기</span>
+                            <span className="text-xs font-bold">시작하기</span>
                         </Button>
                     </CardBody>
                 </Card>
@@ -148,11 +148,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         </h3>
                     </CardHeader>
                     <CardBody className="relative">
-                        <p className="text-gray-400 mb-6">
+                        <p className="text-xs text-gray-400 mb-2 line-clamp-2">
                             하나의 이미지를 다양한 각도로 변환합니다. 
                             정면, 측면, 3/4 각도 등 원하는 앵글로 이미지를 자연스럽게 변환해보세요.
                         </p>
-                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                        <ul className="space-y-1 mb-3 text-xs text-gray-500">
                             <li className="flex items-center gap-2">
                                 <span className="text-purple-500">✓</span> 6가지 앵글 지원
                             </li>
@@ -169,10 +169,10 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         <Button 
                             variant="primary" 
                             fullWidth 
-                            rightIcon={<IconArrowRight size={18} />}
+                            rightIcon={<IconArrowRight size={14} />}
                             className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
                         >
-                            <span className="font-bold">시작하기</span>
+                            <span className="text-xs font-bold">시작하기</span>
                         </Button>
                     </CardBody>
                 </Card>
@@ -198,11 +198,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         </h3>
                     </CardHeader>
                     <CardBody className="relative">
-                        <p className="text-gray-400 mb-6">
+                        <p className="text-xs text-gray-400 mb-2 line-clamp-2">
                             올인원 이미지 AI 스튜디오입니다.
                             가상 착용, 이미지 합성, 이미지 편집 기능을 한 곳에서 사용하세요. 색다른 경험을 체험하세요. 
                         </p>
-                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                        <ul className="space-y-1 mb-3 text-xs text-gray-500">
                             <li className="flex items-center gap-2">
                                 <span className="text-cyan-500">✓</span> 가상 착용 시뮬레이션
                             </li>
@@ -219,11 +219,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         <Button 
                             variant="primary" 
                             fullWidth 
-                            rightIcon={<IconArrowRight size={18} />}
+                            rightIcon={<IconArrowRight size={14} />}
                             className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transform hover:scale-105 transition-all duration-300 animate-pulse border-2 border-white"
                         >
-                            <span className="font-bold flex items-center gap-2">
-                                <IconSparkles size={16} />
+                            <span className="text-xs font-bold flex items-center gap-1">
+                                <IconSparkles size={12} />
                                 시작하기
                             </span>
                         </Button>
@@ -251,11 +251,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         </h3>
                     </CardHeader>
                     <CardBody className="relative">
-                        <p className="text-gray-400 mb-6">
+                        <p className="text-xs text-gray-400 mb-2 line-clamp-2">
                             다양한 AI 이미지 도구를 한 곳에서 사용하세요.
                             페이스 스왑, 모션 생성, 캐릭터 턴어라운드, 씬 퓨전 등 강력한 기능을 제공합니다.
                         </p>
-                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                        <ul className="space-y-1 mb-3 text-xs text-gray-500">
                             <li className="flex items-center gap-2">
                                 <span className="text-purple-500">✓</span> 페이스 스왑
                             </li>
@@ -272,11 +272,11 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                         <Button 
                             variant="primary" 
                             fullWidth 
-                            rightIcon={<IconArrowRight size={18} />}
+                            rightIcon={<IconArrowRight size={14} />}
                             className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
                         >
-                            <span className="font-bold flex items-center gap-2">
-                                <IconSparkles size={16} />
+                            <span className="text-xs font-bold flex items-center gap-1">
+                                <IconSparkles size={12} />
                                 시작하기
                             </span>
                         </Button>
