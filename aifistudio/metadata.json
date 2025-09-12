@@ -1,0 +1,5 @@
+{
+  "name": "AIFI Nanobanana Studio",
+  "description": "An AI-powered image editing and generation studio using Gemini. Features include face swapping, image generation from prompts, and motion transfer from line drawings.",
+  "requestFramePermissions": []
+}

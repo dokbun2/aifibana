@@ -3,8 +3,8 @@ import { IconSettings } from '@tabler/icons-react';
 import { Button } from './ui/Button';
 
 interface HeaderProps {
-    currentPage: 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'api';
-    onNavigate: (page: 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'api') => void;
+    currentPage: 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'multibanana' | 'api';
+    onNavigate: (page: 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'multibanana' | 'api') => void;
     onApiSettingsClick: () => void;
 }
 
@@ -55,6 +55,14 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                             className={currentPage === 'tryon' ? 'bg-gradient-to-r from-cyan-500 to-blue-600' : ''}
                         >
                             AI 스튜디오
+                        </Button>
+                        <Button
+                            variant={currentPage === 'multibanana' ? 'primary' : 'ghost'}
+                            size="sm"
+                            onClick={() => onNavigate('multibanana')}
+                            className={currentPage === 'multibanana' ? 'bg-gradient-to-r from-purple-500 to-pink-600' : ''}
+                        >
+                            멀티바나나
                         </Button>
                         <Button
                             variant="ghost"
@@ -108,6 +116,13 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                         onClick={() => onNavigate('tryon')}
                     >
                         AI 스튜디오
+                    </Button>
+                    <Button
+                        variant={currentPage === 'multibanana' ? 'primary' : 'ghost'}
+                        size="sm"
+                        onClick={() => onNavigate('multibanana')}
+                    >
+                        멀티바나나
                     </Button>
                 </div>
             </div>

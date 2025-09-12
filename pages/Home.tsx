@@ -1,10 +1,10 @@
 import React from 'react';
-import { IconSparkles, IconCamera, IconArrowRight, IconHanger, IconEdit } from '@tabler/icons-react';
+import { IconSparkles, IconCamera, IconArrowRight, IconHanger, IconEdit, IconBrandFramer } from '@tabler/icons-react';
 import { Card, CardHeader, CardBody } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 
 interface HomeProps {
-    onNavigate: (page: 'shot' | 'angle' | 'tryon' | 'texteditor') => void;
+    onNavigate: (page: 'shot' | 'angle' | 'tryon' | 'texteditor' | 'multibanana') => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
@@ -221,6 +221,59 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             fullWidth 
                             rightIcon={<IconArrowRight size={18} />}
                             className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transform hover:scale-105 transition-all duration-300 animate-pulse border-2 border-white"
+                        >
+                            <span className="font-bold flex items-center gap-2">
+                                <IconSparkles size={16} />
+                                시작하기
+                            </span>
+                        </Button>
+                    </CardBody>
+                </Card>
+
+                {/* Multi Banana Card */}
+                <Card 
+                    variant="glass" 
+                    className="group hover:scale-105 transition-all duration-300 cursor-pointer overflow-hidden"
+                    onClick={() => onNavigate('multibanana')}
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <CardHeader className="relative">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-3 bg-purple-500/20 rounded-xl">
+                                <IconBrandFramer size={32} className="text-purple-500" />
+                            </div>
+                            <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-medium animate-pulse">
+                                MULTI
+                            </span>
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                            멀티바나나
+                        </h3>
+                    </CardHeader>
+                    <CardBody className="relative">
+                        <p className="text-gray-400 mb-6">
+                            다양한 AI 이미지 도구를 한 곳에서 사용하세요.
+                            페이스 스왑, 모션 생성, 캐릭터 턴어라운드, 씬 퓨전 등 강력한 기능을 제공합니다.
+                        </p>
+                        <ul className="space-y-2 mb-6 text-sm text-gray-500">
+                            <li className="flex items-center gap-2">
+                                <span className="text-purple-500">✓</span> 페이스 스왑
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-purple-500">✓</span> 이미지 프롬프트 생성
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-purple-500">✓</span> 모션 & 턴어라운드
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <span className="text-purple-500">✓</span> 씬 퓨전
+                            </li>
+                        </ul>
+                        <Button 
+                            variant="primary" 
+                            fullWidth 
+                            rightIcon={<IconArrowRight size={18} />}
+                            className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
                         >
                             <span className="font-bold flex items-center gap-2">
                                 <IconSparkles size={16} />

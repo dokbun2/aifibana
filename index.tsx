@@ -12,9 +12,10 @@ import { ShotGenerator } from './pages/ShotGenerator';
 import { AngleConverter } from './pages/AngleConverter';
 import { TryOn } from './pages/TryOn';
 import { TextEditor } from './pages/TextEditor';
+import { MultiBanana } from './pages/MultiBanana';
 import { IconLoader2 } from '@tabler/icons-react';
 
-type PageType = 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'api';
+type PageType = 'home' | 'shot' | 'angle' | 'tryon' | 'texteditor' | 'multibanana' | 'api';
 
 const Loader = ({ message }: { message: string }) => (
     <div className="text-center">
@@ -126,7 +127,7 @@ const App: React.FC = () => {
             
             <main className="container mx-auto">
                 {currentPage === 'home' && (
-                    <Home onNavigate={(page: 'shot' | 'angle' | 'tryon' | 'texteditor') => setCurrentPage(page)} />
+                    <Home onNavigate={(page: 'shot' | 'angle' | 'tryon' | 'texteditor' | 'multibanana') => setCurrentPage(page)} />
                 )}
                 {currentPage === 'shot' && ai && (
                     <ShotGenerator 
@@ -151,6 +152,9 @@ const App: React.FC = () => {
                         initialPrompt={editImageData?.prompt}
                         onNavigateToShot={() => setCurrentPage('shot')}
                     />
+                )}
+                {currentPage === 'multibanana' && ai && (
+                    <MultiBanana ai={ai} />
                 )}
             </main>
         </div>
