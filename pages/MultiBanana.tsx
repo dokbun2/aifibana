@@ -706,7 +706,7 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                         </div>
                     </div>
                 </div>
-            ) : selectedFeature !== 'scene-fusion' && selectedFeature !== 'image-prompt' ? (
+            ) : selectedFeature !== 'scene-fusion' && selectedFeature !== 'image-prompt' && selectedFeature !== 'character-turnaround' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {config.inputs.map((inputTitle, index) => (
                         <ImageUploader
@@ -886,47 +886,24 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                         </button>
                     </div>
                 </div>
-            ) : selectedFeature === 'character-turnaround' ? (
-                <div>
-                    {/* Prompt Section for Character Turnaround */}
-                    <div className="mb-8">
-                        <label className="block text-sm font-medium text-gray-300 mb-2">프롬프트</label>
-                        <textarea
-                            value={customPrompt}
-                            onChange={(e) => setCustomPrompt(e.target.value)}
-                            rows={3}
-                            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition text-white"
-                            placeholder="예: 이미지 속 캐릭터의 정면, 오른쪽, 왼쪽, 뒷모습을 보여주는 4패널 턴어라운드를 만드세요."
-                        />
-                    </div>
+            ) : null}
 
-                    {/* Source and Result Side by Side */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8">
-                        {/* Source Image Section */}
+            {/* Character Turnaround Layout - Source Upload and Result Side by Side */}
+            {selectedFeature === 'character-turnaround' && (
+                <div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        {/* Source Upload Section */}
                         <div>
-                            <h4 className="text-sm font-medium text-gray-400 mb-2">소스 이미지</h4>
-                            <div className="relative aspect-square overflow-hidden rounded-lg shadow-lg bg-gray-800">
-                                {images[0] ? (
-                                    <img
-                                        src={images[0].preview}
-                                        alt="Source"
-                                        className="absolute inset-0 w-full h-full object-contain"
-                                    />
-                                ) : (
-                                    <div className="flex items-center justify-center h-full text-gray-500">
-                                        <div className="text-center">
-                                            <IconPhoto className="h-12 w-12 mx-auto text-gray-600 mb-2" />
-                                            <p>소스 이미지를 업로드하세요</p>
-                                            <p className="text-xs mt-1">위의 업로드 영역을 사용하세요</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            <ImageUploader
+                                imageFile={images[0]}
+                                setImageFile={(file) => handleImageChange(0, file)}
+                                title="소스 이미지 (스케치 또는 사진)"
+                            />
                         </div>
                         
-                        {/* Result Image Section */}
+                        {/* Result Section */}
                         <div>
-                            <h4 className="text-sm font-medium text-gray-400 mb-2">턴어라운드 결과</h4>
+                            <h4 className="text-sm font-medium text-gray-300 mb-2">턴어라운드 결과</h4>
                             <div className="relative group">
                                 <div className="relative aspect-square overflow-hidden rounded-lg shadow-lg bg-gray-800">
                                     {resultImages.length > 0 ? (
@@ -949,10 +926,14 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                             {isLoading ? (
                                                 <div className="text-center">
                                                     <IconLoader2 className="w-12 h-12 mx-auto animate-spin text-primary mb-2" />
-                                                    <p className="text-sm">생성 중...</p>
+                                                    <p className="text-sm">턴어라운드 생성 중...</p>
                                                 </div>
                                             ) : (
-                                                <p>생성 버튼을 눌러 결과를 확인하세요</p>
+                                                <div className="text-center p-8">
+                                                    <IconCameraRotate className="h-12 w-12 mx-auto text-gray-600 mb-2" />
+                                                    <p className="text-sm">생성 버튼을 눌러</p>
+                                                    <p className="text-sm">결과를 확인하세요</p>
+                                                </div>
                                             )}
                                         </div>
                                     )}
@@ -960,19 +941,34 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                             </div>
                         </div>
                     </div>
+                    
+                    {/* Prompt Section for Character Turnaround */}
+                    <div className="mb-8">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">프롬프트</label>
+                        <textarea
+                            value={customPrompt}
+                            onChange={(e) => setCustomPrompt(e.target.value)}
+                            rows={3}
+                            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition text-white"
+                            placeholder="예: 이미지 속 캐릭터의 정면, 오른쪽, 왼쪽, 뒷모습을 보여주는 4패널 턴어라운드를 만드세요."
+                        />
+                    </div>
 
                     {/* Generate Button */}
                     <div className="flex justify-center mb-8">
                         <button
                             onClick={handleGenerate}
-                            disabled={isLoading || !ai || images.length === 0}
+                            disabled={isLoading || !ai || !images[0]}
                             className="px-8 py-3 bg-primary text-white font-semibold rounded-lg shadow-md hover:bg-primary/90 disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors duration-300"
                         >
                             {isLoading ? '생성 중...' : '캐릭터 턴어라운드 생성'}
                         </button>
                     </div>
                 </div>
-            ) : (
+            )}
+
+            {/* Default layout for other features */}
+            {selectedFeature !== 'scene-fusion' && selectedFeature !== 'image-prompt' && selectedFeature !== 'character-turnaround' && (
                 /* Default layout for other features */
                 <>
                     {/* Generate Button */}
