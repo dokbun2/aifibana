@@ -706,7 +706,7 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                         </div>
                     </div>
                 </div>
-            ) : selectedFeature !== 'scene-fusion' && selectedFeature !== 'character-turnaround' && selectedFeature !== 'image-prompt' ? (
+            ) : selectedFeature !== 'scene-fusion' && selectedFeature !== 'image-prompt' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {config.inputs.map((inputTitle, index) => (
                         <ImageUploader
@@ -719,8 +719,8 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                 </div>
             ) : null}
 
-            {/* Custom Prompt Input (if needed) - not for scene-fusion and image-prompt as they have their own */}
-            {config.needsPrompt && selectedFeature !== 'scene-fusion' && selectedFeature !== 'image-prompt' && (
+            {/* Custom Prompt Input (if needed) - not for scene-fusion, image-prompt, and character-turnaround as they have their own */}
+            {config.needsPrompt && selectedFeature !== 'scene-fusion' && selectedFeature !== 'image-prompt' && selectedFeature !== 'character-turnaround' && (
                 <div className="mb-8">
                     <label className="block text-sm font-medium text-gray-300 mb-2">프롬프트</label>
                     <textarea
@@ -888,6 +888,18 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                 </div>
             ) : selectedFeature === 'character-turnaround' ? (
                 <div>
+                    {/* Prompt Section for Character Turnaround */}
+                    <div className="mb-8">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">프롬프트</label>
+                        <textarea
+                            value={customPrompt}
+                            onChange={(e) => setCustomPrompt(e.target.value)}
+                            rows={3}
+                            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition text-white"
+                            placeholder="예: 이미지 속 캐릭터의 정면, 오른쪽, 왼쪽, 뒷모습을 보여주는 4패널 턴어라운드를 만드세요."
+                        />
+                    </div>
+
                     {/* Source and Result Side by Side */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto mb-8">
                         {/* Source Image Section */}
@@ -902,7 +914,11 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-gray-500">
-                                        <p>소스 이미지를 업로드하세요</p>
+                                        <div className="text-center">
+                                            <IconPhoto className="h-12 w-12 mx-auto text-gray-600 mb-2" />
+                                            <p>소스 이미지를 업로드하세요</p>
+                                            <p className="text-xs mt-1">위의 업로드 영역을 사용하세요</p>
+                                        </div>
                                     </div>
                                 )}
                             </div>
