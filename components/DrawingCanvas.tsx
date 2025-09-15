@@ -78,8 +78,8 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         setLastPoint({ x, y });
     }, [isDrawing, lastPoint, tool, brushSize, brushColor]);
 
-    const stopDrawing = useCallback(() => {
-        if (isDrawing && onCanvasUpdate) {
+    const updateCanvasData = useCallback(() => {
+        if (onCanvasUpdate) {
             const canvas = canvasRef.current;
             if (canvas) {
                 canvas.toBlob((blob) => {
@@ -91,12 +91,18 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
                         };
                         reader.readAsDataURL(blob);
                     }
-                });
+                }, 'image/png');
             }
+        }
+    }, [onCanvasUpdate]);
+
+    const stopDrawing = useCallback(() => {
+        if (isDrawing) {
+            updateCanvasData();
         }
         setIsDrawing(false);
         setLastPoint(null);
-    }, [isDrawing, onCanvasUpdate]);
+    }, [isDrawing, updateCanvasData]);
 
     const clearCanvas = useCallback(() => {
         const canvas = canvasRef.current;
@@ -179,70 +185,70 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
     return (
         <div className={`drawing-canvas-container ${className}`}>
-            <div className="mb-4 flex flex-wrap gap-2 items-center">
+            <div className="mb-2 flex flex-wrap gap-1 items-center">
                 {/* 도구 선택 */}
-                <div className="flex gap-2 bg-gray-800 rounded-lg p-1">
+                <div className="flex gap-1 bg-gray-800 rounded p-0.5">
                     <button
                         onClick={() => setTool('pen')}
-                        className={`p-2 rounded transition-colors ${
+                        className={`p-1 rounded transition-colors ${
                             tool === 'pen' ? 'bg-primary text-white' : 'text-gray-400 hover:text-white'
                         }`}
                         title="펜"
                     >
-                        <IconPencil size={20} />
+                        <IconPencil size={16} />
                     </button>
                     <button
                         onClick={() => setTool('eraser')}
-                        className={`p-2 rounded transition-colors ${
+                        className={`p-1 rounded transition-colors ${
                             tool === 'eraser' ? 'bg-primary text-white' : 'text-gray-400 hover:text-white'
                         }`}
                         title="지우개"
                     >
-                        <IconEraser size={20} />
+                        <IconEraser size={16} />
                     </button>
                 </div>
 
                 {/* 브러시 크기 */}
-                <div className="flex items-center gap-2">
-                    <IconBrush size={20} className="text-gray-400" />
+                <div className="flex items-center gap-1">
+                    <IconBrush size={16} className="text-gray-400" />
                     <input
                         type="range"
                         min="1"
                         max="20"
                         value={brushSize}
                         onChange={(e) => setBrushSize(Number(e.target.value))}
-                        className="w-24"
+                        className="w-16"
                     />
-                    <span className="text-sm text-gray-400 w-8">{brushSize}</span>
+                    <span className="text-xs text-gray-400 w-6">{brushSize}</span>
                 </div>
 
                 {/* 색상 선택 */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     <input
                         type="color"
                         value={brushColor}
                         onChange={(e) => setBrushColor(e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer bg-transparent"
+                        className="w-8 h-8 rounded cursor-pointer bg-transparent"
                         disabled={tool === 'eraser'}
                     />
-                    <span className="text-sm text-gray-400">색상</span>
+                    <span className="text-xs text-gray-400">색상</span>
                 </div>
 
                 {/* 액션 버튼 */}
-                <div className="flex gap-2 ml-auto">
+                <div className="flex gap-1 ml-auto">
                     <button
                         onClick={clearCanvas}
-                        className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                        className="p-1 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
                         title="전체 지우기"
                     >
-                        <IconTrash size={20} />
+                        <IconTrash size={16} />
                     </button>
                     <button
                         onClick={downloadCanvas}
-                        className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                        className="p-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
                         title="다운로드"
                     >
-                        <IconDownload size={20} />
+                        <IconDownload size={16} />
                     </button>
                 </div>
             </div>
@@ -264,9 +270,8 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
                 />
             </div>
 
-            <div className="mt-2 text-xs text-gray-500">
-                <p>💡 포즈 가이드라인을 그려주세요. 그린 선은 결과에 나타나지 않습니다.</p>
-                <p>마우스 또는 터치로 그림을 그리고, 지우개로 수정할 수 있습니다.</p>
+            <div className="mt-1 text-[10px] text-gray-500">
+                <p>💡 포즈 가이드라인을 그려주세요. 선은 결과에 나타나지 않습니다.</p>
             </div>
         </div>
     );

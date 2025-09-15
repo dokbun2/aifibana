@@ -593,20 +593,20 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
             ) : selectedFeature === 'motion' ? (
                 <div>
                     {/* 포즈 입력 방식 선택 */}
-                    <div className="mb-6">
-                        <div className="flex gap-4 mb-4">
+                    <div className="mb-4">
+                        <div className="flex gap-4 mb-2">
                             <button
                                 onClick={() => {
                                     setUseDrawingCanvas(false);
                                     setDrawingData(null);
                                 }}
-                                className={`px-4 py-2 rounded-lg transition-colors ${
+                                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                     !useDrawingCanvas
                                         ? 'bg-primary text-white'
                                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                 }`}
                             >
-                                <IconPhoto className="inline-block w-4 h-4 mr-2" />
+                                <IconPhoto className="inline-block w-3 h-3 mr-1" />
                                 포즈 이미지 업로드
                             </button>
                             <button
@@ -614,37 +614,37 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                     setUseDrawingCanvas(true);
                                     setImages([null, null, null, null]);
                                 }}
-                                className={`px-4 py-2 rounded-lg transition-colors ${
+                                className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                     useDrawingCanvas
                                         ? 'bg-primary text-white'
                                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                                 }`}
                             >
-                                <IconPencil className="inline-block w-4 h-4 mr-2" />
+                                <IconPencil className="inline-block w-3 h-3 mr-1" />
                                 커스텀 드로잉
                             </button>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6 mb-8">
-                        {/* 왼쪽: 포즈 입력 (업로드 또는 드로잉) */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                    {/* 3열 수평 레이아웃 */}
+                    <div className="grid grid-cols-3 gap-4 mb-6">
+                        {/* 첫 번째 열: 포즈 입력 (업로드 또는 드로잉) */}
+                        <div className="flex flex-col">
+                            <label className="text-xs font-medium text-gray-300 mb-1">
                                 {useDrawingCanvas ? '커스텀 드로잉 (포즈 가이드)' : '라인 드로잉 (포즈 참조)'}
                             </label>
                             {useDrawingCanvas && (
-                                <div className="mb-2 p-2 bg-blue-900/20 border border-blue-600/30 rounded-lg">
-                                    <p className="text-xs text-blue-400">
-                                        ℹ️ 포즈 가이드라인만 그려주세요. 이 선들은 최종 이미지에 나타나지 않고,
-                                        캐릭터의 포즈 참조로만 사용됩니다.
+                                <div className="mb-1 p-1 bg-blue-900/20 border border-blue-600/30 rounded text-xs">
+                                    <p className="text-blue-400">
+                                        ℹ️ 포즈 가이드라인만 그려주세요
                                     </p>
                                 </div>
                             )}
 
                             {useDrawingCanvas ? (
                                 <DrawingCanvas
-                                    width={512}
-                                    height={512}
+                                    width={380}
+                                    height={380}
                                     onCanvasUpdate={(imageData) => {
                                         setDrawingData(imageData);
                                     }}
@@ -669,8 +669,8 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                         }
                                     }}
                                     onDragOver={(e) => e.preventDefault()}
-                                    className="relative border-2 border-dashed border-gray-600 rounded-lg p-6 hover:border-primary transition-colors cursor-pointer bg-gray-800/50"
-                                    style={{ width: '512px', height: '512px' }}
+                                    className="relative border-2 border-dashed border-gray-600 rounded-lg p-4 hover:border-primary transition-colors cursor-pointer bg-gray-800/50"
+                                    style={{ width: '100%', height: '380px' }}
                                 >
                                     <input
                                         type="file"
@@ -702,8 +702,8 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                         </div>
                                     ) : (
                                         <div className="w-full h-full flex flex-col items-center justify-center">
-                                            <IconPhoto className="h-16 w-16 text-gray-400" />
-                                            <p className="mt-4 text-sm text-gray-400 text-center">
+                                            <IconPhoto className="h-12 w-12 text-gray-400" />
+                                            <p className="mt-2 text-xs text-gray-400 text-center">
                                                 클릭하거나 드래그하여<br />포즈 이미지 업로드
                                             </p>
                                         </div>
@@ -712,32 +712,32 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                             )}
                         </div>
 
-                        {/* 오른쪽: 캐릭터 이미지들 */}
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <label className="text-sm font-medium text-gray-300">
+                        {/* 두 번째 열: 캐릭터 이미지들 */}
+                        <div className="flex flex-col">
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="text-xs font-medium text-gray-300">
                                     캐릭터 이미지 ({characterImages.filter(img => img !== null).length}/{config.maxCharacters})
                                 </label>
                                 {characterImages.length < config.maxCharacters && (
                                     <button
                                         onClick={addCharacterSlot}
-                                        className="px-3 py-1 text-sm bg-primary/20 text-primary border border-primary rounded-lg hover:bg-primary/30 transition-colors"
+                                        className="px-2 py-0.5 text-xs bg-primary/20 text-primary border border-primary rounded hover:bg-primary/30 transition-colors"
                                     >
-                                        + 캐릭터 추가
+                                        + 추가
                                     </button>
                                 )}
                             </div>
                             <div
-                                className="grid grid-cols-2 gap-3 p-4 border-2 border-gray-600 rounded-lg bg-gray-800/30"
-                                style={{ width: '512px', height: '512px', overflow: 'auto' }}
+                                className="grid grid-cols-2 gap-2 p-2 border-2 border-gray-600 rounded-lg bg-gray-800/30"
+                                style={{ width: '100%', height: '380px', overflow: 'auto' }}
                             >
                                 {characterImages.map((image, index) => (
                                     <div key={`character-${index}`} className="relative h-fit">
-                                        <div className="relative border-2 border-dashed border-gray-600 rounded-lg p-2 hover:border-primary transition-colors bg-gray-800/50">
+                                        <div className="relative border border-dashed border-gray-600 rounded p-1 hover:border-primary transition-colors bg-gray-800/50">
                                             {characterImages.length > 1 && (
                                                 <button
                                                     onClick={() => removeCharacterSlot(index)}
-                                                    className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                                                    className="absolute -top-1 -right-1 z-10 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
                                                 >
                                                     ×
                                                 </button>
@@ -783,7 +783,7 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                                 />
                                                 {image ? (
-                                                    <div className="aspect-square overflow-hidden rounded-md bg-gray-700">
+                                                    <div className="aspect-square overflow-hidden rounded bg-gray-700">
                                                         <img
                                                             src={image.preview}
                                                             alt={`캐릭터 ${index + 1}`}
@@ -791,15 +791,61 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                                         />
                                                     </div>
                                                 ) : (
-                                                    <div className="aspect-square flex flex-col items-center justify-center bg-gray-900/50 rounded-md">
-                                                        <IconPhoto className="h-8 w-8 text-gray-400" />
-                                                        <p className="mt-1 text-xs text-gray-400">캐릭터 {index + 1}</p>
+                                                    <div className="aspect-square flex flex-col items-center justify-center bg-gray-900/50 rounded">
+                                                        <IconPhoto className="h-6 w-6 text-gray-400" />
+                                                        <p className="mt-1 text-[10px] text-gray-400">캐릭터 {index + 1}</p>
                                                     </div>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+
+                        {/* 세 번째 열: 결과 이미지 */}
+                        <div className="flex flex-col">
+                            <label className="text-xs font-medium text-gray-300 mb-1">
+                                생성 결과
+                            </label>
+                            <div
+                                className="relative border-2 border-gray-600 rounded-lg bg-gray-800/50 overflow-hidden"
+                                style={{ width: '100%', height: '380px' }}
+                            >
+                                {resultImages.length > 0 ? (
+                                    <div className="relative w-full h-full">
+                                        <img
+                                            src={`data:image/png;base64,${resultImages[0]}`}
+                                            alt="Motion Result"
+                                            className="absolute inset-0 w-full h-full object-contain"
+                                        />
+                                        <a
+                                            href={`data:image/png;base64,${resultImages[0]}`}
+                                            download={`motion-result.png`}
+                                            className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs hover:bg-black/90"
+                                        >
+                                            다운로드
+                                        </a>
+                                    </div>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        {isLoading ? (
+                                            <div className="text-center">
+                                                <IconLoader2 className="w-10 h-10 mx-auto animate-spin text-primary mb-2" />
+                                                <p className="text-xs text-gray-400">생성 중...</p>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center p-4">
+                                                <IconSparkles className="h-10 w-10 mx-auto text-gray-600 mb-2" />
+                                                <p className="text-xs text-gray-400">
+                                                    포즈와 캐릭터를<br />
+                                                    업로드한 후<br />
+                                                    생성 버튼을 누르세요
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
