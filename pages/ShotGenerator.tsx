@@ -1,13 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import { GoogleGenAI, Modality } from '@google/genai';
-import { 
-    IconUpload, IconRocket, IconEdit, IconZoomIn, IconDownload, 
-    IconX, IconChevronDown, IconMaximize, IconSparkles, IconLoader2 
+import {
+    IconUpload, IconRocket, IconEdit, IconZoomIn, IconDownload,
+    IconX, IconChevronDown, IconMaximize, IconSparkles, IconLoader2,
+    IconAlertCircle, IconQuestionMark
 } from '@tabler/icons-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Textarea } from '../components/ui/Input';
 import { Image } from 'lucide-react';
+import { handleApiError, checkRateLimit, trackApiUsage } from '../utils/errorHandler';
+import { DEFAULT_MODELS } from '../config/models';
+import QuotaStatus from '../components/QuotaStatus';
+import HelpModal from '../components/HelpModal';
 
 const MAX_SHOT_FILES = 8;
 
@@ -31,6 +36,8 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai, onEditImage, o
     const [isShotLoading, setIsShotLoading] = useState(false);
     const [shotLoadingMessage, setShotLoadingMessage] = useState('');
     const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+    const [showHelpModal, setShowHelpModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const fileToBase64 = (file: File): Promise<{ data: string; type: string }> => new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -96,7 +103,7 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai, onEditImage, o
             try {
                 const uniqueKoreanValues = Array.from(new Set(koreanValues));
                 const prompt = `Translate the following Korean phrases to English. Provide only the translated text, preserving the original order. Input: [${uniqueKoreanValues.join(", ")}]`;
-                const result = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
+                const result = await ai.models.generateContent({ model: DEFAULT_MODELS.TRANSLATION, contents: prompt });
                 const translatedArray = result.text.replace(/\[|\]/g, '').split(',').map(t => t.trim());
                 const translationMap: { [key: string]: string } = {};
                 uniqueKoreanValues.forEach((original, index) => {
@@ -118,14 +125,25 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai, onEditImage, o
 
     const callImageApi = useCallback(async (prompt: string, images: {data: string, type: string}[]) => {
         if (!ai) return null;
+
+        // Check rate limit before making request
+        const rateCheck = checkRateLimit();
+        if (!rateCheck.canProceed) {
+            setErrorMessage(rateCheck.message || '요청 제한에 도달했습니다.');
+            setShowHelpModal(true);
+            return null;
+        }
+
         try {
+            // Track API usage
+            trackApiUsage();
             const imageParts = images.map(img => ({
                 inlineData: { data: img.data, mimeType: img.type || 'image/jpeg' }
             }));
             const contents = { parts: [...imageParts, { text: prompt }] };
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash-image-preview',
+                model: DEFAULT_MODELS.IMAGE_GENERATION,
                 contents: contents,
                 config: { 
                     responseModalities: [Modality.IMAGE, Modality.TEXT],
@@ -144,9 +162,16 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai, onEditImage, o
                 }
             }
             throw new Error("API 응답에서 이미지를 찾을 수 없습니다.");
-        } catch (error) {
+        } catch (error: any) {
             console.error("Image API Error:", error);
-            alert("이미지 처리 중 오류발생. 구글 정책 제한 및 일일 할당량 확인 후 다시 시도해주세요");
+            const errorResponse = handleApiError(error);
+            setErrorMessage(errorResponse.userMessage);
+
+            // Show help modal for quota errors
+            if (errorResponse.action === 'upgrade' && errorResponse.showHelp) {
+                setShowHelpModal(true);
+            }
+
             return null;
         }
     }, [ai]);
@@ -200,6 +225,13 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai, onEditImage, o
 
     return (
         <>
+            {/* Help Modal */}
+            <HelpModal
+                isOpen={showHelpModal}
+                onClose={() => setShowHelpModal(false)}
+                initialSection="quota"
+            />
+
             {zoomedImage && (
                 <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setZoomedImage(null)}>
                     <div className="relative max-w-7xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
@@ -215,23 +247,60 @@ export const ShotGenerator: React.FC<ShotGeneratorProps> = ({ ai, onEditImage, o
             )}
 
             <div className="container mx-auto p-4 md:p-8">
-                <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-3xl font-bold text-center flex items-center gap-3">
-                        <IconSparkles size={36} className="text-orange-500" />
-                        <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-                            일관성 있는 샷 이미지 만들기
-                        </span>
-                    </h2>
-                    <Button
-                        onClick={onNavigateToEditor}
-                        variant="ghost"
-                        leftIcon={<IconEdit size={20} />}
-                        className="text-emerald-400 hover:text-emerald-300"
-                    >
-                        이미지 편집기로 이동
-                    </Button>
+                <div className="flex flex-col gap-4 mb-8">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-3xl font-bold text-center flex items-center gap-3">
+                            <IconSparkles size={36} className="text-orange-500" />
+                            <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+                                일관성 있는 샷 이미지 만들기
+                            </span>
+                        </h2>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => setShowHelpModal(true)}
+                                variant="ghost"
+                                size="sm"
+                                className="text-gray-400 hover:text-white"
+                            >
+                                <IconQuestionMark size={20} />
+                            </Button>
+                            <Button
+                                onClick={onNavigateToEditor}
+                                variant="ghost"
+                                leftIcon={<IconEdit size={20} />}
+                                className="text-emerald-400 hover:text-emerald-300"
+                            >
+                                이미지 편집기로 이동
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Quota Status */}
+                    <div className="w-full">
+                        <QuotaStatus
+                            onUpgradeClick={() => setShowHelpModal(true)}
+                        />
+                    </div>
+
+                    {/* Error Message */}
+                    {errorMessage && (
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+                            <div className="flex items-start gap-2">
+                                <IconAlertCircle size={20} className="text-red-500 mt-0.5" />
+                                <div className="flex-1">
+                                    <p className="text-sm text-red-400 whitespace-pre-line">{errorMessage}</p>
+                                    <button
+                                        onClick={() => setErrorMessage(null)}
+                                        className="text-xs text-gray-400 hover:text-white mt-2"
+                                    >
+                                        닫기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-6">
                         <Card variant="elevated" className="p-6">

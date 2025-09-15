@@ -41,21 +41,45 @@ npm preview
 ### Key Functions & API Integration
 
 1. **processAndAssemblePrompt**: Translates Korean prompts to English and structures them for the AI
-   - Uses Gemini's gemini-2.0-flash-exp model for translation
+   - Uses Gemini's `gemini-2.5-flash` model for translation
    - Formats block-style prompts (KEY: VALUE; format)
 
 2. **callImageApi**: Sends images and prompts to Gemini API
-   - Uses gemini-2.0-flash-exp for image generation
+   - Uses `gemini-2.5-flash-image-preview` for image generation
    - Handles base64 image conversion and response processing
 
 3. **Image Models Used**:
-   - `gemini-2.0-flash-exp` - Main image generation model
-   - Translation also uses the same model
+   - `gemini-2.5-flash-image-preview` - Main image generation model
+   - `gemini-2.5-flash` - Korean to English translation
 
 ### API Key Management
 - Stores API key in localStorage as `gemini_api_key`
 - Falls back to `process.env.API_KEY` if not in localStorage
 - ApiSetup component handles initial API key configuration
+
+### API Quota Limits (2025)
+
+#### Free Tier Limitations
+- **Rate Limits**: 5 requests per minute (1 request every 12 seconds)
+- **Daily Quota**: 25 requests per day
+- **Reset Time**: Midnight Pacific Time (Korea: 5 PM KST)
+- **Token Limit**: 1 million token context window
+
+#### Common Quota Issues & Solutions
+1. **429 Error (Quota Exceeded)**:
+   - Free tier users hit the 5 RPM or 25 RPD limit
+   - Solution: Wait for quota reset or upgrade to paid tier
+
+2. **Upgrading to Paid Tier**:
+   - Go to [Google AI Studio](https://aistudio.google.com)
+   - Navigate to Settings > Plan Information
+   - Click "Set up Billing" to enable paid tier
+   - Paid tier offers significantly higher limits
+
+3. **Best Practices**:
+   - Implement request queuing (12-second intervals)
+   - Cache responses when possible
+   - Track daily usage to avoid hitting limits
 
 ### Default Prompt Structure
 The app uses a block-style prompt format:

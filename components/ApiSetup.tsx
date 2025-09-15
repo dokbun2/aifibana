@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconX } from '@tabler/icons-react';
+import { IconX, IconInfoCircle, IconExternalLink } from '@tabler/icons-react';
 
 interface ApiSetupProps {
     onApiKeySet: (apiKey: string) => void;
@@ -71,15 +71,61 @@ const ApiSetup: React.FC<ApiSetupProps> = ({ onApiKeySet, onClose, showCloseButt
                     <div className="mb-4 text-sm text-gray-400 space-y-2">
                         <p>이 앱을 사용하려면 Google Gemini API 키가 필요합니다.</p>
                         <p>
-                            <a 
-                                href="https://aistudio.google.com/app/apikey" 
-                                target="_blank" 
+                            <a
+                                href="https://aistudio.google.com/app/apikey"
+                                target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-primary hover:underline"
+                                className="text-primary hover:underline inline-flex items-center gap-1"
                             >
-                                여기서 무료 API 키를 발급받으세요 →
+                                여기서 무료 API 키를 발급받으세요
+                                <IconExternalLink size={14} />
                             </a>
                         </p>
+                    </div>
+
+                    {/* Quota Information */}
+                    <div className="mb-6 bg-gray-800 rounded-lg p-4 border border-gray-700">
+                        <div className="flex items-start gap-2 mb-3">
+                            <IconInfoCircle size={20} className="text-yellow-500 mt-0.5" />
+                            <h3 className="text-sm font-semibold text-white">API 등급별 제한 사항</h3>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4 text-xs">
+                            <div className="space-y-2">
+                                <h4 className="text-gray-300 font-medium">📌 무료 등급 (Free Tier)</h4>
+                                <ul className="space-y-1 text-gray-400">
+                                    <li>• 분당 5개 요청 (12초 간격)</li>
+                                    <li>• 일일 25개 요청 제한</li>
+                                    <li>• 매일 오후 5시 리셋 (한국시간)</li>
+                                    <li className="text-yellow-500">⚠️ 테스트용으로만 권장</li>
+                                </ul>
+                            </div>
+
+                            <div className="space-y-2">
+                                <h4 className="text-gray-300 font-medium">💎 유료 등급 (Paid Tier)</h4>
+                                <ul className="space-y-1 text-gray-400">
+                                    <li>• 분당 360개 요청</li>
+                                    <li>• 일일 제한 없음</li>
+                                    <li>• 안정적인 서비스</li>
+                                    <li className="text-green-500">✅ 실제 사용 권장</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div className="mt-3 pt-3 border-t border-gray-700">
+                            <p className="text-xs text-gray-400">
+                                💡 할당량 초과 시 "429 Error"가 발생합니다.
+                                <a
+                                    href="https://aistudio.google.com/app/plan"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary hover:underline ml-1 inline-flex items-center gap-1"
+                                >
+                                    유료 업그레이드 방법
+                                    <IconExternalLink size={12} />
+                                </a>
+                            </p>
+                        </div>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">

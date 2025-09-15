@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { GoogleGenAI, Modality } from '@google/genai';
-import { IconLoader2, IconPhoto, IconSparkles, IconCameraRotate, IconArrowsExchange, IconBrandFramer, IconX } from '@tabler/icons-react';
+import { IconLoader2, IconPhoto, IconSparkles, IconCameraRotate, IconArrowsExchange, IconBrandFramer, IconX, IconPencil } from '@tabler/icons-react';
+import { DrawingCanvas } from '../components/DrawingCanvas';
 
 interface ImageFile {
     file: File;
@@ -38,8 +39,8 @@ const featureConfig = {
         multipleCharacters: true,
         maxCharacters: 8,
         needsPrompt: true,
-        defaultPrompt: '라인 드로잉과 같은 포즈로 소용돌이치는 모래와 구름이 있는 하늘을 날고 있는 캐릭터들의 얼굴을 확대',
-        prompt: "Generate the final image with a 1:1 aspect ratio. The first image is a line drawing that defines the pose and composition. The following images provide the characters to use. Generate a new image based on the following instruction, applying all characters to the poses in the line drawing in a new scene: "
+        defaultPrompt: '자연스러운 배경',
+        prompt: "CRITICAL INSTRUCTION - POSE IS PRIORITY #1: You MUST replicate the EXACT pose, body position, and limb arrangement shown in the first image (the line drawing/sketch). This is the MOST IMPORTANT requirement. The first image shows the precise pose that the character MUST be in - copy it EXACTLY. Use the following character images for the person's appearance/face/clothing. DO NOT show any sketch lines in the final output - create a photorealistic result. The pose from the first image is MANDATORY and takes absolute priority over any text description. Additional scene details (only if pose is perfectly matched): "
     },
     'character-turnaround': {
         title: '캐릭터 턴어라운드',
@@ -144,6 +145,8 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
     const [resultImages, setResultImages] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [useDrawingCanvas, setUseDrawingCanvas] = useState(false); // 드로잉 캔버스 사용 여부
+    const [drawingData, setDrawingData] = useState<string | null>(null); // 드로잉 데이터
 
     const config = featureConfig[selectedFeature] as any;
     
@@ -249,9 +252,14 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
     const handleGenerate = useCallback(async () => {
         // 모션 테크닉 특별 처리
         if (selectedFeature === 'motion') {
-            // 라인 드로잉 체크
-            if (!images[0]) {
+            // 포즈 입력 체크 (업로드 이미지 또는 드로잉)
+            if (!useDrawingCanvas && !images[0]) {
                 setError('라인 드로잉 이미지를 업로드해주세요.');
+                return;
+            }
+
+            if (useDrawingCanvas && !drawingData) {
+                setError('포즈를 그려주세요.');
                 return;
             }
 
@@ -272,9 +280,21 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
             setResultImages([]);
 
             try {
-                // 라인 드로잉 + 모든 캐릭터 이미지들을 하나의 배열로 합침
+                // 포즈 데이터 준비 (업로드된 이미지 또는 드로잉)
+                let poseImageData;
+                if (useDrawingCanvas && drawingData) {
+                    // 드로잉 데이터를 base64로 변환
+                    const base64Data = drawingData.split(',')[1];
+                    poseImageData = { data: base64Data, mimeType: 'image/png' };
+                } else if (images[0]) {
+                    poseImageData = { data: images[0].base64, mimeType: images[0].file.type };
+                } else {
+                    throw new Error('포즈 데이터가 없습니다.');
+                }
+
+                // 포즈 + 모든 캐릭터 이미지들을 하나의 배열로 합침
                 const allImages = [
-                    { data: images[0]!.base64, mimeType: images[0]!.file.type },
+                    poseImageData,
                     ...validCharacters.map(img => ({
                         data: img!.base64,
                         mimeType: img!.file.type
@@ -536,13 +556,25 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                     {/* Prompt Section */}
                     {config.needsPrompt && (
                         <div className="mb-8">
-                            <label className="block text-sm font-medium text-gray-300 mb-2">프롬프트</label>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                {selectedFeature === 'motion' ? '배경/환경 설정 (선택사항)' : '프롬프트'}
+                            </label>
+                            {selectedFeature === 'motion' && (
+                                <div className="mb-2 p-2 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+                                    <p className="text-xs text-yellow-400">
+                                        ⚠️ 드로잉한 포즈가 최우선으로 적용됩니다. 텍스트는 배경이나 환경 설정에만 사용하세요.
+                                        포즈 자체는 드로잉을 따르며, 텍스트로 포즈를 변경할 수 없습니다.
+                                    </p>
+                                </div>
+                            )}
                             <textarea
                                 value={customPrompt}
                                 onChange={(e) => setCustomPrompt(e.target.value)}
                                 rows={3}
                                 className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition text-white"
-                                placeholder="예: 주황색 우주복을 입은 남자가 하늘색 배경에서 우주비행사로 있는 클로즈업 샷"
+                                placeholder={selectedFeature === 'motion'
+                                    ? "배경이나 환경만 설명하세요 (예: 해변가, 우주 공간, 숲 속). 포즈는 드로잉을 따릅니다."
+                                    : "예: 주황색 우주복을 입은 남자가 하늘색 배경에서 우주비행사로 있는 클로즈업 샷"}
                             />
                         </div>
                     )}
@@ -559,118 +591,162 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                     </div>
                 </div>
             ) : selectedFeature === 'motion' ? (
-                <div className="flex gap-6 mb-8">
-                    {/* 라인 드로잉 업로드 - 왼쪽 작은 섹션 */}
-                    <div className="w-1/4 flex-shrink-0">
-                        <label className="block text-sm font-medium text-gray-300 mb-2">라인 드로잉 (포즈)</label>
-                        <div
-                            onDrop={(e) => {
-                                e.preventDefault();
-                                const file = e.dataTransfer.files[0];
-                                if (file && file.type.startsWith('image/')) {
-                                    const reader = new FileReader();
-                                    reader.onloadend = () => {
-                                        const base64 = reader.result as string;
-                                        handleImageChange(0, {
-                                            file,
-                                            preview: base64,
-                                            base64: base64.split(',')[1]
-                                        });
-                                    };
-                                    reader.readAsDataURL(file);
-                                }
-                            }}
-                            onDragOver={(e) => e.preventDefault()}
-                            className="relative border-2 border-dashed border-gray-600 rounded-lg p-3 hover:border-primary transition-colors cursor-pointer bg-gray-800/50"
-                        >
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                        const reader = new FileReader();
-                                        reader.onloadend = () => {
-                                            const base64 = reader.result as string;
-                                            handleImageChange(0, {
-                                                file,
-                                                preview: base64,
-                                                base64: base64.split(',')[1]
-                                            });
-                                        };
-                                        reader.readAsDataURL(file);
-                                    }
+                <div>
+                    {/* 포즈 입력 방식 선택 */}
+                    <div className="mb-6">
+                        <div className="flex gap-4 mb-4">
+                            <button
+                                onClick={() => {
+                                    setUseDrawingCanvas(false);
+                                    setDrawingData(null);
                                 }}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                            />
-                            {images[0] ? (
-                                <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-700">
-                                    <img 
-                                        src={images[0].preview} 
-                                        alt="라인 드로잉" 
-                                        className="absolute inset-0 w-full h-full object-contain" 
-                                    />
-                                </div>
-                            ) : (
-                                <div className="aspect-square flex flex-col items-center justify-center">
-                                    <IconPhoto className="h-10 w-10 text-gray-400" />
-                                    <p className="mt-2 text-xs text-gray-400 text-center">포즈 드로잉</p>
-                                </div>
-                            )}
+                                className={`px-4 py-2 rounded-lg transition-colors ${
+                                    !useDrawingCanvas
+                                        ? 'bg-primary text-white'
+                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                }`}
+                            >
+                                <IconPhoto className="inline-block w-4 h-4 mr-2" />
+                                포즈 이미지 업로드
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setUseDrawingCanvas(true);
+                                    setImages([null, null, null, null]);
+                                }}
+                                className={`px-4 py-2 rounded-lg transition-colors ${
+                                    useDrawingCanvas
+                                        ? 'bg-primary text-white'
+                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                }`}
+                            >
+                                <IconPencil className="inline-block w-4 h-4 mr-2" />
+                                커스텀 드로잉
+                            </button>
                         </div>
                     </div>
-                    
-                    {/* 캐릭터 이미지들 업로드 - 오른쪽 넓은 섹션 */}
-                    <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                            <label className="text-sm font-medium text-gray-300">캐릭터 이미지 ({characterImages.filter(img => img !== null).length}/{config.maxCharacters})</label>
-                            {characterImages.length < config.maxCharacters && (
-                                <button
-                                    onClick={addCharacterSlot}
-                                    className="px-3 py-1 text-sm bg-primary/20 text-primary border border-primary rounded-lg hover:bg-primary/30 transition-colors"
+
+                    <div className="grid grid-cols-2 gap-6 mb-8">
+                        {/* 왼쪽: 포즈 입력 (업로드 또는 드로잉) */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                {useDrawingCanvas ? '커스텀 드로잉 (포즈 가이드)' : '라인 드로잉 (포즈 참조)'}
+                            </label>
+                            {useDrawingCanvas && (
+                                <div className="mb-2 p-2 bg-blue-900/20 border border-blue-600/30 rounded-lg">
+                                    <p className="text-xs text-blue-400">
+                                        ℹ️ 포즈 가이드라인만 그려주세요. 이 선들은 최종 이미지에 나타나지 않고,
+                                        캐릭터의 포즈 참조로만 사용됩니다.
+                                    </p>
+                                </div>
+                            )}
+
+                            {useDrawingCanvas ? (
+                                <DrawingCanvas
+                                    width={512}
+                                    height={512}
+                                    onCanvasUpdate={(imageData) => {
+                                        setDrawingData(imageData);
+                                    }}
+                                    className="w-full"
+                                />
+                            ) : (
+                                <div
+                                    onDrop={(e) => {
+                                        e.preventDefault();
+                                        const file = e.dataTransfer.files[0];
+                                        if (file && file.type.startsWith('image/')) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                const base64 = reader.result as string;
+                                                handleImageChange(0, {
+                                                    file,
+                                                    preview: base64,
+                                                    base64: base64.split(',')[1]
+                                                });
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                    onDragOver={(e) => e.preventDefault()}
+                                    className="relative border-2 border-dashed border-gray-600 rounded-lg p-6 hover:border-primary transition-colors cursor-pointer bg-gray-800/50"
+                                    style={{ width: '512px', height: '512px' }}
                                 >
-                                    + 캐릭터 추가
-                                </button>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    const base64 = reader.result as string;
+                                                    handleImageChange(0, {
+                                                        file,
+                                                        preview: base64,
+                                                        base64: base64.split(',')[1]
+                                                    });
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    {images[0] ? (
+                                        <div className="relative w-full h-full overflow-hidden rounded-lg bg-gray-700">
+                                            <img
+                                                src={images[0].preview}
+                                                alt="라인 드로잉"
+                                                className="absolute inset-0 w-full h-full object-contain"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center">
+                                            <IconPhoto className="h-16 w-16 text-gray-400" />
+                                            <p className="mt-4 text-sm text-gray-400 text-center">
+                                                클릭하거나 드래그하여<br />포즈 이미지 업로드
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
                             )}
                         </div>
-                        <div className="grid grid-cols-4 gap-3">
-                            {characterImages.map((image, index) => (
-                                <div key={`character-${index}`} className="relative">
-                                    <div className="relative border-2 border-dashed border-gray-600 rounded-lg p-2 hover:border-primary transition-colors">
-                                        {characterImages.length > 1 && (
-                                            <button
-                                                onClick={() => removeCharacterSlot(index)}
-                                                className="absolute -top-2 -right-2 z-10 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors text-xs"
-                                            >
-                                                ×
-                                            </button>
-                                        )}
-                                        <div
-                                            onDrop={(e) => {
-                                                e.preventDefault();
-                                                const file = e.dataTransfer.files[0];
-                                                if (file && file.type.startsWith('image/')) {
-                                                    const reader = new FileReader();
-                                                    reader.onloadend = () => {
-                                                        const base64 = reader.result as string;
-                                                        handleCharacterImageChange(index, {
-                                                            file,
-                                                            preview: base64,
-                                                            base64: base64.split(',')[1]
-                                                        });
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                }
-                                            }}
-                                            onDragOver={(e) => e.preventDefault()}
-                                            className="cursor-pointer"
-                                        >
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file) {
+
+                        {/* 오른쪽: 캐릭터 이미지들 */}
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="text-sm font-medium text-gray-300">
+                                    캐릭터 이미지 ({characterImages.filter(img => img !== null).length}/{config.maxCharacters})
+                                </label>
+                                {characterImages.length < config.maxCharacters && (
+                                    <button
+                                        onClick={addCharacterSlot}
+                                        className="px-3 py-1 text-sm bg-primary/20 text-primary border border-primary rounded-lg hover:bg-primary/30 transition-colors"
+                                    >
+                                        + 캐릭터 추가
+                                    </button>
+                                )}
+                            </div>
+                            <div
+                                className="grid grid-cols-2 gap-3 p-4 border-2 border-gray-600 rounded-lg bg-gray-800/30"
+                                style={{ width: '512px', height: '512px', overflow: 'auto' }}
+                            >
+                                {characterImages.map((image, index) => (
+                                    <div key={`character-${index}`} className="relative h-fit">
+                                        <div className="relative border-2 border-dashed border-gray-600 rounded-lg p-2 hover:border-primary transition-colors bg-gray-800/50">
+                                            {characterImages.length > 1 && (
+                                                <button
+                                                    onClick={() => removeCharacterSlot(index)}
+                                                    className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                            <div
+                                                onDrop={(e) => {
+                                                    e.preventDefault();
+                                                    const file = e.dataTransfer.files[0];
+                                                    if (file && file.type.startsWith('image/')) {
                                                         const reader = new FileReader();
                                                         reader.onloadend = () => {
                                                             const base64 = reader.result as string;
@@ -683,26 +759,48 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                                         reader.readAsDataURL(file);
                                                     }
                                                 }}
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            />
-                                            {image ? (
-                                                <div className="aspect-square overflow-hidden rounded-md bg-gray-700">
-                                                    <img 
-                                                        src={image.preview} 
-                                                        alt={`캐릭터 ${index + 1}`} 
-                                                        className="w-full h-full object-contain" 
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <div className="aspect-square flex flex-col items-center justify-center bg-gray-800/50 rounded-md">
-                                                    <IconPhoto className="h-6 w-6 text-gray-400" />
-                                                    <p className="mt-1 text-xs text-gray-400">추가</p>
-                                                </div>
-                                            )}
+                                                onDragOver={(e) => e.preventDefault()}
+                                                className="cursor-pointer"
+                                            >
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            const reader = new FileReader();
+                                                            reader.onloadend = () => {
+                                                                const base64 = reader.result as string;
+                                                                handleCharacterImageChange(index, {
+                                                                    file,
+                                                                    preview: base64,
+                                                                    base64: base64.split(',')[1]
+                                                                });
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        }
+                                                    }}
+                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                />
+                                                {image ? (
+                                                    <div className="aspect-square overflow-hidden rounded-md bg-gray-700">
+                                                        <img
+                                                            src={image.preview}
+                                                            alt={`캐릭터 ${index + 1}`}
+                                                            className="w-full h-full object-contain"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="aspect-square flex flex-col items-center justify-center bg-gray-900/50 rounded-md">
+                                                        <IconPhoto className="h-8 w-8 text-gray-400" />
+                                                        <p className="mt-1 text-xs text-gray-400">캐릭터 {index + 1}</p>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
