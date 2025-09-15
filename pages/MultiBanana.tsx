@@ -283,9 +283,16 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                 // 포즈 데이터 준비 (업로드된 이미지 또는 드로잉)
                 let poseImageData;
                 if (useDrawingCanvas && drawingData) {
-                    // 드로잉 데이터를 base64로 변환
-                    const base64Data = drawingData.split(',')[1];
-                    poseImageData = { data: base64Data, mimeType: 'image/png' };
+                    // 드로잉 데이터 검증 및 변환
+                    if (!drawingData.startsWith('data:image')) {
+                        throw new Error('잘못된 이미지 데이터 형식입니다.');
+                    }
+                    // data:image/png;base64, 부분을 제거하고 순수 base64만 추출
+                    const base64Match = drawingData.match(/^data:image\/[a-z]+;base64,(.+)$/i);
+                    if (!base64Match || !base64Match[1]) {
+                        throw new Error('이미지 데이터를 파싱할 수 없습니다.');
+                    }
+                    poseImageData = { data: base64Match[1], mimeType: 'image/png' };
                 } else if (images[0]) {
                     poseImageData = { data: images[0].base64, mimeType: images[0].file.type };
                 } else {
@@ -302,6 +309,13 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                 ];
 
                 const finalPrompt = config.prompt + customPrompt;
+
+                console.log('Sending to API:', {
+                    imageCount: allImages.length,
+                    poseType: useDrawingCanvas ? 'drawing' : 'upload',
+                    promptLength: finalPrompt.length
+                });
+
                 const result = await editImage(allImages, finalPrompt);
 
                 if (result.base64Image) {
@@ -553,28 +567,24 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                         </div>
                     </div>
 
-                    {/* Prompt Section */}
+                    {/* Prompt Section for Motion */}
                     {config.needsPrompt && (
-                        <div className="mb-8">
+                        <div className="mb-6">
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                                {selectedFeature === 'motion' ? '배경/환경 설정 (선택사항)' : '프롬프트'}
+                                배경/환경 설정 (선택사항)
                             </label>
-                            {selectedFeature === 'motion' && (
-                                <div className="mb-2 p-2 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
-                                    <p className="text-xs text-yellow-400">
-                                        ⚠️ 드로잉한 포즈가 최우선으로 적용됩니다. 텍스트는 배경이나 환경 설정에만 사용하세요.
-                                        포즈 자체는 드로잉을 따르며, 텍스트로 포즈를 변경할 수 없습니다.
-                                    </p>
-                                </div>
-                            )}
+                            <div className="mb-2 p-2 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+                                <p className="text-xs text-yellow-400">
+                                    ⚠️ 드로잉한 포즈가 최우선으로 적용됩니다. 텍스트는 배경이나 환경 설정에만 사용하세요.
+                                    포즈 자체는 드로잉을 따르며, 텍스트로 포즈를 변경할 수 없습니다.
+                                </p>
+                            </div>
                             <textarea
                                 value={customPrompt}
                                 onChange={(e) => setCustomPrompt(e.target.value)}
                                 rows={3}
                                 className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition text-white"
-                                placeholder={selectedFeature === 'motion'
-                                    ? "배경이나 환경만 설명하세요 (예: 해변가, 우주 공간, 숲 속). 포즈는 드로잉을 따릅니다."
-                                    : "예: 주황색 우주복을 입은 남자가 하늘색 배경에서 우주비행사로 있는 클로즈업 샷"}
+                                placeholder="배경이나 환경만 설명하세요 (예: 해변가, 우주 공간, 숲 속). 포즈는 드로잉을 따릅니다."
                             />
                         </div>
                     )}
@@ -633,13 +643,6 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                             <label className="text-xs font-medium text-gray-300 mb-1">
                                 {useDrawingCanvas ? '커스텀 드로잉 (포즈 가이드)' : '라인 드로잉 (포즈 참조)'}
                             </label>
-                            {useDrawingCanvas && (
-                                <div className="mb-1 p-1 bg-blue-900/20 border border-blue-600/30 rounded text-xs">
-                                    <p className="text-blue-400">
-                                        ℹ️ 포즈 가이드라인만 그려주세요
-                                    </p>
-                                </div>
-                            )}
 
                             {useDrawingCanvas ? (
                                 <DrawingCanvas

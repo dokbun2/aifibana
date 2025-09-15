@@ -31,7 +31,23 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         // 초기 캔버스 설정 - 검은색 배경
         ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, width, height);
-    }, [width, height]);
+
+        // Send initial canvas state after a short delay to ensure canvas is ready
+        setTimeout(() => {
+            if (onCanvasUpdate && canvas) {
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            const base64 = reader.result as string;
+                            onCanvasUpdate(base64);
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }, 'image/png');
+            }
+        }, 100);
+    }, [width, height, onCanvasUpdate]);
 
     const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = canvasRef.current;
@@ -114,10 +130,9 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, width, height);
 
-        if (onCanvasUpdate) {
-            onCanvasUpdate('');
-        }
-    }, [width, height, onCanvasUpdate]);
+        // Send the cleared (black) canvas data
+        updateCanvasData();
+    }, [width, height, updateCanvasData]);
 
     const downloadCanvas = useCallback(() => {
         const canvas = canvasRef.current;
@@ -180,12 +195,37 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
     }, [isDrawing, lastPoint, tool, brushSize, brushColor]);
 
     const handleTouchEnd = useCallback(() => {
-        stopDrawing();
-    }, [stopDrawing]);
+        if (isDrawing) {
+            updateCanvasData();
+        }
+        setIsDrawing(false);
+        setLastPoint(null);
+    }, [isDrawing, updateCanvasData]);
 
     return (
         <div className={`drawing-canvas-container ${className}`}>
-            <div className="mb-2 flex flex-wrap gap-1 items-center">
+            <div className="relative inline-block">
+                <canvas
+                    ref={canvasRef}
+                    width={width}
+                    height={height}
+                    className="border-2 border-gray-600 rounded-lg cursor-crosshair bg-black"
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                    onMouseLeave={stopDrawing}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    style={{ touchAction: 'none' }}
+                />
+            </div>
+
+            <div className="mt-1 text-[10px] text-gray-500">
+                <p>💡 포즈 가이드라인을 그려주세요. 선은 결과에 나타나지 않습니다.</p>
+            </div>
+
+            <div className="mt-2 flex flex-wrap gap-1 items-center">
                 {/* 도구 선택 */}
                 <div className="flex gap-1 bg-gray-800 rounded p-0.5">
                     <button
@@ -251,27 +291,6 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
                         <IconDownload size={16} />
                     </button>
                 </div>
-            </div>
-
-            <div className="relative inline-block">
-                <canvas
-                    ref={canvasRef}
-                    width={width}
-                    height={height}
-                    className="border-2 border-gray-600 rounded-lg cursor-crosshair bg-black"
-                    onMouseDown={startDrawing}
-                    onMouseMove={draw}
-                    onMouseUp={stopDrawing}
-                    onMouseLeave={stopDrawing}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    style={{ touchAction: 'none' }}
-                />
-            </div>
-
-            <div className="mt-1 text-[10px] text-gray-500">
-                <p>💡 포즈 가이드라인을 그려주세요. 선은 결과에 나타나지 않습니다.</p>
             </div>
         </div>
     );
