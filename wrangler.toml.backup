@@ -1,0 +1,14 @@
+name = "aifi-banana"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "dist"
+
+# Pages 프로젝트 설정
+[site]
+bucket = "./dist"
+
+[build]
+command = "npm run build"
+
+# 환경 변수 (필요한 경우)
+[vars]
+NODE_VERSION = "20"

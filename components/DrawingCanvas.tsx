@@ -130,9 +130,24 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, width, height);
 
-        // Send the cleared (black) canvas data
-        updateCanvasData();
-    }, [width, height, updateCanvasData]);
+        // Clear 버튼을 눌렀을 때만 빈 캔버스 데이터 전송
+        // 검은색 배경만 있는 상태로 업데이트
+        if (onCanvasUpdate) {
+            // 캔버스를 검은색으로 지운 후에도 유효한 이미지로 처리
+            setTimeout(() => {
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            const base64 = reader.result as string;
+                            onCanvasUpdate(base64);
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }, 'image/png');
+            }, 50);
+        }
+    }, [width, height, onCanvasUpdate]);
 
     const downloadCanvas = useCallback(() => {
         const canvas = canvasRef.current;

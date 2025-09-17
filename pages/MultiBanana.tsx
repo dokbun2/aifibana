@@ -18,10 +18,10 @@ type FeatureType = 'face-swap' | 'image-prompt' | 'motion' | 'character-turnarou
 const featureConfig = {
     'face-swap': {
         title: '페이스 스왑',
-        description: '얼굴을 바꿀 영감 이미지와 대상 이미지를 업로드하여 페이스 스왑을 실행하세요.',
+        description: '얼굴을 제공할 이미지(1번)와 몸/배경을 제공할 이미지(2번)를 업로드하여 페이스 스왑을 실행하세요.',
         icon: IconArrowsExchange,
-        inputs: ['영감 이미지 (얼굴)', '대상 이미지 (장면/몸)'],
-        prompt: "From the first image provided, extract the person's face. From the second image, use the overall scene, body, and style. Combine these by swapping the face from the first image onto the person in the second image. Ensure the lighting, color grading, and style of the final image match the second image perfectly."
+        inputs: ['얼굴 소스 (이 얼굴을 사용)', '몸/배경 타겟 (이 몸과 배경 사용)'],
+        prompt: "Create a composite image by combining elements from both provided images. Use the facial features (eyes, nose, mouth, face shape, facial structure) from the FIRST image and place them onto the person in the SECOND image. Keep everything else from the second image unchanged - the body, clothing, pose, hands, background, setting, and any text. The result should look like the person from image 1 is in the scene from image 2. Make the face replacement look natural and seamless."
     },
     'image-prompt': {
         title: '이미지 생성',
@@ -161,6 +161,10 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
         setImages([null, null, null, null]);
         setResultImages([]);
         setError(null);
+        // 기능 변경 시 드로잉 관련 상태도 초기화
+        setUseDrawingCanvas(false);
+        setDrawingData(null);
+        setCharacterImages([null]);
     }, [selectedFeature]);
 
     const handleImageChange = (index: number, file: ImageFile | null) => {
@@ -425,7 +429,7 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [ai, selectedFeature, images, characterImages, customPrompt, config]);
+    }, [ai, selectedFeature, images, characterImages, customPrompt, config, useDrawingCanvas, drawingData]);
 
     return (
         <div className="max-w-7xl mx-auto p-6">
@@ -440,10 +444,7 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                                 key={key}
                                 onClick={() => {
                                     setSelectedFeature(key as FeatureType);
-                                    setImages([null, null]);
-                                    setCharacterImages([null]); // 캐릭터 이미지 배열 초기화
-                                    setResultImages([]);
-                                    setError(null);
+                                    // useEffect에서 초기화를 처리하므로 여기서는 기능만 변경
                                 }}
                                 className={`p-4 rounded-lg border-2 transition-all ${
                                     selectedFeature === key
@@ -622,7 +623,8 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                             <button
                                 onClick={() => {
                                     setUseDrawingCanvas(true);
-                                    setImages([null, null, null, null]);
+                                    // 드로잉 모드로 전환할 때 업로드된 이미지만 제거
+                                    handleImageChange(0, null);
                                 }}
                                 className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                     useDrawingCanvas
