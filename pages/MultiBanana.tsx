@@ -574,12 +574,6 @@ export const MultiBanana: React.FC<MultiBananaProps> = ({ ai }) => {
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                 배경/환경 설정 (선택사항)
                             </label>
-                            <div className="mb-2 p-2 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
-                                <p className="text-xs text-yellow-400">
-                                    ⚠️ 드로잉한 포즈가 최우선으로 적용됩니다. 텍스트는 배경이나 환경 설정에만 사용하세요.
-                                    포즈 자체는 드로잉을 따르며, 텍스트로 포즈를 변경할 수 없습니다.
-                                </p>
-                            </div>
                             <textarea
                                 value={customPrompt}
                                 onChange={(e) => setCustomPrompt(e.target.value)}
