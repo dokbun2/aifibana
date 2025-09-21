@@ -12,10 +12,10 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         <div className="container mx-auto p-4 md:p-8">
             {/* Hero Section */}
             <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-pulse">
-                    <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">AIFI</span>
-                    <span className="bg-gradient-to-b from-green-400 to-orange-600 bg-clip-text text-transparent">와</span>
-                    <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent ml-2">나노바나나가 만났다.</span>
+                <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                    <span className="text-orange-500">AIFI</span>
+                    <span className="text-green-500">와</span>
+                    <span className="text-purple-500 ml-2">나노바나나가 만났다.</span>
                 </h1>
                 <p className="text-xl text-gray-400 mb-8">
                     AI로 일관성 있는 이미지를 만들고 수정하세요
@@ -36,7 +36,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             <div className="p-2 bg-emerald-500/20 rounded-lg">
                                 <IconEdit size={20} className="text-emerald-500" />
                             </div>
-                            <span className="text-xs bg-gradient-to-r from-emerald-500 to-green-500 text-white px-2 py-0.5 rounded-full font-medium animate-pulse">
+                            <span className="text-xs bg-gradient-to-r from-emerald-500 to-green-500 text-white px-2 py-0.5 rounded-full font-medium">
                                 NEW
                             </span>
                         </div>
@@ -67,7 +67,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             variant="primary" 
                             fullWidth 
                             rightIcon={<IconArrowRight size={14} />}
-                            className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white animate-pulse"
+                            className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transform hover:scale-105 transition-all duration-300"
                         >
                             <span className="text-xs font-bold flex items-center gap-1">
                                 <IconSparkles size={12} />
@@ -120,7 +120,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             variant="primary" 
                             fullWidth 
                             rightIcon={<IconArrowRight size={14} />}
-                            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
+                            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transform hover:scale-105 transition-all duration-300"
                         >
                             <span className="text-xs font-bold">시작하기</span>
                         </Button>
@@ -220,7 +220,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             variant="primary" 
                             fullWidth 
                             rightIcon={<IconArrowRight size={14} />}
-                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transform hover:scale-105 transition-all duration-300 animate-pulse border-2 border-white"
+                            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transform hover:scale-105 transition-all duration-300"
                         >
                             <span className="text-xs font-bold flex items-center gap-1">
                                 <IconSparkles size={12} />
