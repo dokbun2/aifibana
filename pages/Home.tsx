@@ -170,7 +170,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             variant="primary" 
                             fullWidth 
                             rightIcon={<IconArrowRight size={14} />}
-                            className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
+                            className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300"
                         >
                             <span className="text-xs font-bold">시작하기</span>
                         </Button>
@@ -242,7 +242,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             <div className="p-2 bg-purple-500/20 rounded-lg">
                                 <IconBrandFramer size={20} className="text-purple-500" />
                             </div>
-                            <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-medium animate-pulse">
+                            <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-medium">
                                 MULTI
                             </span>
                         </div>
@@ -273,7 +273,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                             variant="primary" 
                             fullWidth 
                             rightIcon={<IconArrowRight size={14} />}
-                            className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300 border-2 border-white"
+                            className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transform hover:scale-105 transition-all duration-300"
                         >
                             <span className="text-xs font-bold flex items-center gap-1">
                                 <IconSparkles size={12} />
