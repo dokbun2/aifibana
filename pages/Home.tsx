@@ -13,9 +13,9 @@ export const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             {/* Hero Section */}
             <div className="text-center mb-12">
                 <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                    <span className="text-orange-500">AIFI</span>
-                    <span className="text-green-500">와</span>
-                    <span className="text-purple-500 ml-2">나노바나나가 만났다.</span>
+                    <span style={{ color: '#f97316' }}>AIFI</span>
+                    <span style={{ color: '#22c55e' }}>와</span>
+                    <span style={{ color: '#a855f7' }} className="ml-2">나노바나나가 만났다.</span>
                 </h1>
                 <p className="text-xl text-gray-400 mb-8">
                     AI로 일관성 있는 이미지를 만들고 수정하세요
