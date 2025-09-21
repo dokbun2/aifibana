@@ -12,6 +12,27 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      build: {
+        rollupOptions: {
+          input: {
+            main: path.resolve(__dirname, 'index.html'),
+          },
+        },
+      },
+      esbuild: {
+        loader: 'tsx',
+        include: /\.[tj]sx?$/,
+      },
+      optimizeDeps: {
+        esbuildOptions: {
+          loader: {
+            '.js': 'jsx',
+            '.ts': 'tsx',
+            '.jsx': 'jsx',
+            '.tsx': 'tsx',
+          },
+        },
+      },
     };
 });
