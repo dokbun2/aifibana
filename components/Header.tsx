@@ -19,8 +19,8 @@ export const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate, onApiSe
                         onClick={() => onNavigate('home')}
                     >
                         <h1 className="text-2xl md:text-3xl font-bold">
-                            <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">AIFI</span>
-                            <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent ml-1">바나나</span>
+                            <span className="text-orange-500">AIFI</span>
+                            <span className="text-accent ml-1">바나나</span>
                         </h1>
                     </div>
 
