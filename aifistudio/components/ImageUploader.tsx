@@ -5,10 +5,11 @@ import { fileToBase64 } from '../utils/fileUtils';
 interface ImageUploaderProps {
   imageFile: ImageFile | null;
   setImageFile: (file: ImageFile | null) => void;
-  title: string;
+  title?: string;
+  hideLabel?: boolean;
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({ imageFile, setImageFile, title }) => {
+const ImageUploader: React.FC<ImageUploaderProps> = ({ imageFile, setImageFile, title = "이미지 업로드", hideLabel = false }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,11 +42,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ imageFile, setImageFile, 
   };
 
   return (
-    <div className="w-full">
-      <label className="block text-sm font-medium text-brand-text-secondary mb-2">{title}</label>
+    <div className="w-full h-full">
+      {!hideLabel && <label className="block text-sm font-medium text-brand-text-secondary mb-2">{title}</label>}
       <div
         onClick={() => inputRef.current?.click()}
-        className="relative flex justify-center items-center w-full h-64 bg-brand-surface border-2 border-dashed border-brand-border rounded-lg cursor-pointer hover:border-white transition-colors duration-200 group"
+        className={`relative flex justify-center items-center w-full ${hideLabel ? 'h-full' : 'h-64'} bg-brand-surface border-2 border-dashed border-brand-border rounded-lg cursor-pointer hover:border-white transition-colors duration-200 group`}
       >
         <input
           type="file"

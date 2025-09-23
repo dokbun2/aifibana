@@ -4,6 +4,7 @@ import { IconUpload, IconHanger, IconDownload, IconLoader2, IconSparkles, IconPh
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { ImageEditor } from '../components/ImageEditor';
+import { DrawableImageUpload } from '../components/DrawableImageUpload';
 import { generateCompositeImage, editImage as editImageAPI } from '../services/geminiService';
 import type { UploadedImage, GeneratedResult, CompositeImageRequest, EditImageRequest, TabType } from '../types';
 
@@ -30,6 +31,7 @@ export const TryOn: React.FC<TryOnProps> = ({ ai }) => {
     const [baseImage, setBaseImage] = useState<UploadedImage | null>(null);
     const [overlayImage, setOverlayImage] = useState<UploadedImage | null>(null);
     const [compositePrompt, setCompositePrompt] = useState<string>('');
+    const [drawnArea, setDrawnArea] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
     
     // 이미지 편집 상태
     const [editImage, setEditImage] = useState<UploadedImage | null>(null);
@@ -239,18 +241,32 @@ export const TryOn: React.FC<TryOnProps> = ({ ai }) => {
 
     const handleComposite = async () => {
         if (!baseImage || !compositePrompt.trim()) return;
-        
+
+        if (!overlayImage) {
+            setError("추가 이미지를 업로드해주세요.");
+            return;
+        }
+
+        if (!drawnArea) {
+            setError("기본 이미지에 합성할 영역을 그려주세요.");
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
         setLoadingMessage("AI가 이미지를 합성하고 있습니다...");
-        
+
         try {
+            // 드로잉 영역 정보를 포함한 프롬프트 생성
+            const areaInfo = `Selected area: position (${Math.round(drawnArea.x)}, ${Math.round(drawnArea.y)}), size ${Math.round(drawnArea.width)}x${Math.round(drawnArea.height)} pixels.`;
+            const enhancedPrompt = `${areaInfo}\n\nInstructions:\n1. Take the base image as the foundation\n2. In the marked area, seamlessly blend elements from the overlay image\n3. ${compositePrompt}\n4. Ensure natural lighting, perspective, and color matching`;
+
             const request: CompositeImageRequest = {
                 baseImage,
                 overlayImage,
-                prompt: compositePrompt,
+                prompt: enhancedPrompt,
             };
-            
+
             const result = await generateCompositeImage(ai, request);
             
             if (result.image) {
@@ -529,67 +545,33 @@ export const TryOn: React.FC<TryOnProps> = ({ ai }) => {
 
             {/* 이미지 합성 탭 */}
             <div className={`${activeTab === 'composite' ? 'block' : 'hidden'}`} id="composite-panel" role="tabpanel" aria-labelledby="composite-tab">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Input Section */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Base Image Upload */}
-                            <Card variant="elevated" className="p-6">
-                                <h3 className="font-semibold mb-4 text-gray-200 flex items-center gap-2">
-                                    <span className="text-purple-500">1.</span> 기본 이미지 (필수)
-                                </h3>
-                                <div 
-                                    className="border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer hover:border-purple-500 transition-all duration-300 p-6 flex flex-col items-center justify-center"
-                                    style={{aspectRatio: '1'}}
-                                    onClick={() => document.getElementById('base-file-input')?.click()}
-                                >
-                                    {baseImage ? (
-                                        <div className="relative">
-                                            <img src={baseImage.preview} alt="Base" className="w-full h-full object-contain rounded-lg" />
-                                            <Button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setBaseImage(null);
-                                                    setResultImage(null);
-                                                }}
-                                                variant="danger"
-                                                size="xs"
-                                                className="absolute top-2 right-2"
-                                            >
-                                                제거
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <IconUpload size={40} className="mx-auto mb-2 text-gray-500" />
-                                            <p className="text-gray-400 text-sm">기본 이미지 업로드</p>
-                                        </>
-                                    )}
-                                    <input 
-                                        type="file" 
-                                        id="base-file-input" 
-                                        className="hidden" 
-                                        accept="image/*" 
-                                        onChange={handleBaseImageUpload} 
-                                    />
-                                </div>
-                            </Card>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Base Image with Drawing */}
+                    <Card variant="elevated" className="p-6">
+                        <DrawableImageUpload
+                            imageFile={baseImage}
+                            setImageFile={setBaseImage}
+                            title="기본 이미지 (합성 영역 그리기)"
+                            drawnArea={drawnArea}
+                            setDrawnArea={setDrawnArea}
+                        />
+                    </Card>
 
-                            {/* Overlay Image Upload */}
-                            <Card variant="elevated" className="p-6">
-                                <h3 className="font-semibold mb-4 text-gray-200 flex items-center gap-2">
-                                    <span className="text-purple-500">2.</span> 추가 이미지 (선택)
-                                </h3>
-                                <div 
-                                    className="border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer hover:border-purple-500 transition-all duration-300 p-6 flex flex-col items-center justify-center"
-                                    style={{aspectRatio: '1'}}
-                                    onClick={() => document.getElementById('overlay-file-input')?.click()}
-                                >
-                                    {overlayImage ? (
-                                        <div className="relative">
-                                            <img src={overlayImage.preview} alt="Overlay" className="w-full h-full object-contain rounded-lg" />
-                                            <Button
-                                                onClick={(e) => {
+                    {/* Overlay Image */}
+                    <Card variant="elevated" className="p-6">
+                        <h3 className="font-semibold mb-4 text-gray-200 flex items-center gap-2">
+                            <span className="text-purple-500">2.</span> 추가 이미지 (합성할 요소)
+                        </h3>
+                        <div
+                            className="border-2 border-dashed border-gray-600 rounded-lg text-center cursor-pointer hover:border-purple-500 transition-all duration-300 flex flex-col items-center justify-center"
+                            style={{height: '400px'}}
+                            onClick={() => document.getElementById('overlay-file-input')?.click()}
+                        >
+                            {overlayImage ? (
+                                <div className="relative">
+                                    <img src={overlayImage.preview} alt="Overlay" className="w-full h-full object-contain rounded-lg" />
+                                    <Button
+                                        onClick={(e) => {
                                                     e.stopPropagation();
                                                     setOverlayImage(null);
                                                     setResultImage(null);
@@ -615,14 +597,35 @@ export const TryOn: React.FC<TryOnProps> = ({ ai }) => {
                                         onChange={handleOverlayImageUpload} 
                                     />
                                 </div>
-                            </Card>
-                        </div>
+                    </Card>
 
-                        {/* Prompt Input */}
-                        <Card variant="elevated" className="p-6">
-                            <h3 className="font-semibold mb-4 text-gray-200 flex items-center gap-2">
-                                <span className="text-purple-500">3.</span> 합성 내용 설명
-                            </h3>
+                    {/* Result Section */}
+                    <Card variant="elevated" className="p-6">
+                        <h3 className="font-semibold mb-4 text-gray-200 flex items-center gap-2">
+                            <span className="text-purple-500">3.</span> 결과 이미지
+                        </h3>
+                        <div
+                            className="border-2 border-dashed border-gray-600 rounded-lg flex items-center justify-center bg-gray-900"
+                            style={{height: '400px'}}
+                        >
+                            {resultImage ? (
+                                <img src={resultImage} alt="Result" className="w-full h-full object-contain rounded-lg" />
+                            ) : (
+                                <div className="text-center p-6">
+                                    <p className="text-gray-400 text-sm">
+                                        {isLoading ? '이미지 합성 중...' : '합성된 이미지가 여기에 표시됩니다'}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </Card>
+                </div>
+
+                {/* Prompt Input */}
+                <Card variant="elevated" className="p-6 mt-6">
+                    <h3 className="font-semibold mb-4 text-gray-200 flex items-center gap-2">
+                        <span className="text-purple-500">4.</span> 합성 내용 설명
+                    </h3>
                             <textarea
                                 value={compositePrompt}
                                 onChange={(e) => setCompositePrompt(e.target.value)}
@@ -638,7 +641,7 @@ export const TryOn: React.FC<TryOnProps> = ({ ai }) => {
                         {/* Composite Button */}
                         <Button
                             onClick={handleComposite}
-                            disabled={!baseImage || !compositePrompt.trim() || isLoading}
+                            disabled={!baseImage || !overlayImage || !drawnArea || !compositePrompt.trim() || isLoading}
                             isLoading={isLoading}
                             size="lg"
                             fullWidth
@@ -649,8 +652,15 @@ export const TryOn: React.FC<TryOnProps> = ({ ai }) => {
                             {isLoading ? '합성 중...' : '이미지 합성하기'}
                         </Button>
 
+                        {/* Error Message */}
+                        {error && (
+                            <Card variant="glass" className="p-4 mt-4 border-red-500">
+                                <p className="text-red-400 text-sm">{error}</p>
+                            </Card>
+                        )}
+
                         {/* Tips */}
-                        <Card variant="glass" className="p-4">
+                        <Card variant="glass" className="p-4 mt-4">
                             <h4 className="font-semibold text-gray-300 mb-2">💡 이미지 합성 팁</h4>
                             <ul className="space-y-1 text-sm text-gray-500">
                                 <li>• 구체적이고 상세한 설명을 제공하면 더 좋은 결과를 얻을 수 있습니다</li>
@@ -665,34 +675,6 @@ export const TryOn: React.FC<TryOnProps> = ({ ai }) => {
                                 <p className="text-red-400">{error}</p>
                             </Card>
                         )}
-                    </div>
-
-                    {/* Result Section */}
-                    <Card variant="glass" padding="none" className="h-[600px] flex flex-col items-center justify-center relative overflow-hidden">
-                        {!resultImage && !isLoading && (
-                            <div className="text-center text-gray-500 p-8">
-                                <IconSparkles size={48} className="mx-auto mb-4 opacity-50" />
-                                <p>이미지 합성 결과가 여기에 표시됩니다</p>
-                            </div>
-                        )}
-                        {isLoading && <Loader message={loadingMessage} />}
-                        {resultImage && !isLoading && (
-                            <>
-                                <img src={resultImage} alt="Composite Result" className="w-full h-full rounded-md object-contain p-4" />
-                                <div className="absolute bottom-4 flex gap-2">
-                                    <Button
-                                        onClick={() => downloadImage(resultImage, 'composite-result.png')}
-                                        variant="success"
-                                        size="sm"
-                                        leftIcon={<IconDownload size={18} />}
-                                    >
-                                        다운로드
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                    </Card>
-                </div>
             </div>
 
             {/* 이미지 편집 탭 */}

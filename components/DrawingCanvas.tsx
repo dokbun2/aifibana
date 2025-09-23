@@ -54,8 +54,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         if (!canvas) return;
 
         const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         setIsDrawing(true);
         setLastPoint({ x, y });
@@ -71,8 +73,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
         if (!ctx) return;
 
         const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         ctx.beginPath();
         ctx.moveTo(lastPoint.x, lastPoint.y);
@@ -167,8 +171,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (touch.clientX - rect.left) * scaleX;
+        const y = (touch.clientY - rect.top) * scaleY;
 
         setIsDrawing(true);
         setLastPoint({ x, y });
@@ -186,8 +192,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({
 
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (touch.clientX - rect.left) * scaleX;
+        const y = (touch.clientY - rect.top) * scaleY;
 
         ctx.beginPath();
         ctx.moveTo(lastPoint.x, lastPoint.y);
